@@ -1,0 +1,27 @@
+"","taxonomic_group","sdm_type","tot_doc_taxa","n_doc","prop_doc"
+"1","Amphibians","No SDMs",47,41,0.87
+"2","Amphibians","SDM w/out CC",47,1,0.02
+"3","Amphibians","CC-SDM",47,5,0.11
+"4","Arthropods","No SDMs",98,94,0.96
+"5","Arthropods","SDM w/out CC",98,2,0.02
+"6","Arthropods","CC-SDM",98,2,0.02
+"7","Birds","No SDMs",157,134,0.85
+"8","Birds","SDM w/out CC",157,14,0.09
+"9","Birds","CC-SDM",157,8,0.05
+"10","Birds","CC-SDM & SDM w/out CC",157,1,0.01
+"11","Lichens","No SDMs",36,32,0.89
+"12","Lichens","SDM w/out CC",36,2,0.06
+"13","Lichens","CC-SDM & SDM w/out CC",36,2,0.06
+"14","Mammals (terrestrial)","No SDMs",63,57,0.9
+"15","Mammals (terrestrial)","SDM w/out CC",63,6,0.1
+"16","Molluscs","No SDMs",19,16,0.84
+"17","Molluscs","SDM w/out CC",19,3,0.16
+"18","Mosses","No SDMs",29,29,1
+"19","Reptiles","No SDMs",76,65,0.86
+"20","Reptiles","SDM w/out CC",76,5,0.07
+"21","Reptiles","CC-SDM",76,2,0.03
+"22","Reptiles","CC-SDM & SDM w/out CC",76,4,0.05
+"23","Vascular Plants","No SDMs",335,320,0.96
+"24","Vascular Plants","SDM w/out CC",335,13,0.04
+"25","Vascular Plants","CC-SDM",335,1,0
+"26","Vascular Plants","CC-SDM & SDM w/out CC",335,1,0
