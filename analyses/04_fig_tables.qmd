@@ -15,7 +15,7 @@ editor_options:
 # run the code that conducts statistical analysis first, since it uses some of the same databases but in a different way
 #code_path = paste0(path,"/analyses/") # set path
 source(here::here("analyses/03_statistical_analyses.R")) #source code
-
+source(here::here("analyses/supp01_stat_analysis_alt_rangesize_transformation.R"))
 #reset working directory and path
 #setwd("~/projects/sarsdm")
 #path = getwd()
