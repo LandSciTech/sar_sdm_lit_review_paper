@@ -2415,14 +2415,7 @@ rm(glm_db, sp_10p_range, sp_90p_range, range_quantile_10, range_quantile_90,
 
 ## Supplementary Figures
 
-**Figure S1**
-
-```{r}
-# # save supp figure 1
-# jpeg(paste0(path,"/figures/supp_ld_sdm_presence_by_doctype.jpeg"), units="in", width=6, height=4, res=1000)
-# supp_fig_ldtype_doc_comb_sdm
-# dev.off()
-```
+**Figure S1** is the PRISMA diagram. This figure is created using a Word Doc template in the /figures folder.
 
 **Figure S2**
 
