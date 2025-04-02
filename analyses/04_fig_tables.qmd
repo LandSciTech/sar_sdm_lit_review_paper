@@ -639,6 +639,74 @@ sarsdm %>%
   kable()
 ```
 
+**Applications vs doc type**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Types of listing documents vs the number of documents (n_doc_X) that used a SDM (any type) for each of the sections/applications examined. ch = critical habitat, oth = other, th = threats (any), si = species information, str = strategies. "
+
+sarsdm <- sarsdm %>% filter (ld_sdm == "1") %>%
+  # create binary columns showing whether a SDM (any type) was used in each of the sections
+  mutate(ld_section_si = as.numeric(grepl('SI', X2_cc_sdm_section) | grepl('SI', X2_other_sdm_section)), #species information
+         ld_section_th = as.numeric(grepl('TH', X2_cc_sdm_section) | grepl('TH', X2_other_sdm_section)), #threats (any)
+         ld_section_ch = as.numeric(grepl('CH', X2_cc_sdm_section) | grepl('CH', X2_other_sdm_section)), #critical habitat
+         ld_section_str = as.numeric(grepl('STR', X2_cc_sdm_section) | grepl('STR', X2_other_sdm_section)), #strategies
+         ld_section_oth = as.numeric(grepl('OTH', X2_cc_sdm_section) | grepl('OTH', X2_other_sdm_section))) #other
+
+# create information summarizing the number of times each application was used
+# species information
+app_by_doc_si <- sarsdm %>%
+  group_by(doc_type, ld_section_si) %>%
+  mutate(n_doc_si = n_distinct(rowID)) %>%
+  ungroup() %>%
+  filter(ld_section_si == "1") %>%
+  select(doc_type, n_doc_si) %>%
+  unique()
+
+# threats (any)
+app_by_doc_th <- sarsdm %>%
+  group_by(doc_type, ld_section_th) %>%
+  mutate(n_doc_th = n_distinct(rowID)) %>%
+  ungroup() %>%
+  filter(ld_section_th == "1") %>%
+  select(doc_type, n_doc_th) %>%
+  unique()
+
+# critical habitat
+app_by_doc_ch <- sarsdm %>%
+  group_by(doc_type, ld_section_ch) %>%
+  mutate(n_doc_ch = n_distinct(rowID)) %>%
+  ungroup() %>%
+  filter(ld_section_ch == "1") %>%
+  select(doc_type, n_doc_ch) %>%
+  unique()
+
+# strategies
+app_by_doc_str <- sarsdm %>%
+  group_by(doc_type, ld_section_str) %>%
+  mutate(n_doc_str = n_distinct(rowID)) %>%
+  ungroup() %>%
+  filter(ld_section_str == "1") %>%
+  select(doc_type, n_doc_str) %>%
+  unique()
+
+# others
+app_by_doc_oth <- sarsdm %>%
+  group_by(doc_type, ld_section_oth) %>%
+  mutate(n_doc_oth = n_distinct(rowID)) %>%
+  ungroup() %>%
+  filter(ld_section_oth == "1") %>%
+  select(doc_type, n_doc_oth) %>%
+  unique()
+
+app_by_doc <- merge(app_by_doc_ch, app_by_doc_oth, by = "doc_type", all = TRUE)
+app_by_doc <- merge(app_by_doc, app_by_doc_th, by = "doc_type", all = TRUE)
+app_by_doc <- merge(app_by_doc, app_by_doc_si, by = "doc_type", all = TRUE)
+app_by_doc <- merge(app_by_doc, app_by_doc_str, by = "doc_type", all = TRUE)
+
+app_by_doc %>% kable()
+  
+```
+
 **Figure 2**
 
 ```{r, echo = FALSE}
