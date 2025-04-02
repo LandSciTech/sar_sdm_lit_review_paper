@@ -2478,7 +2478,7 @@ supp_fig_pnl_sdm_uses_ld_by_doctype
 dev.off()
 ```
 
-**Figure S2**
+**Figure S3**
 
 ```{r, echo = FALSE}
 #| label: "get-data-supp-fig2"
@@ -2531,13 +2531,13 @@ supp_fig_prop_sp_model_ca
 ```
 
 ```{r}
-# save figure S2
+# save figure
 jpeg(paste0(path,"/figures/supp_prop_sp_modelled_ca.jpeg"), units="in", width=5, height=3, res=800)
 supp_fig_prop_sp_model_ca
 dev.off()
 ```
 
-**Figure S3**
+**Figure S4**
 
 ```{r, echo = FALSE}
 
@@ -2679,7 +2679,7 @@ plot_grid(supp_fig_diff_re_sdm, supp_fig_diff_re_cc_sdm,
 ```
 
 ```{r}
-#save figure S3
+#save figure
 jpeg(paste0(path,"/figures/supp_diff_re.jpeg"), units="in",  width=6, height=4, res=1000)
 plot_grid(supp_fig_diff_re_sdm, supp_fig_diff_re_cc_sdm,
           labels = "AUTO",
@@ -2687,7 +2687,7 @@ plot_grid(supp_fig_diff_re_sdm, supp_fig_diff_re_cc_sdm,
 dev.off()
 ```
 
-**Figure S4**
+**Figure S5**
 
 ```{r, echo = FALSE}
 
@@ -2836,7 +2836,7 @@ plot_grid(supp_fig_sdm_re_ca, supp_fig_cc_sdm_re_ca,
 ```
 
 ```{r}
-# save figure S4
+# save figure
 jpeg(paste0(path,"/figures/supp_ca_re.jpeg"), units="in", width=6, height=4, res=1000)
 plot_grid(supp_fig_sdm_re_ca, supp_fig_cc_sdm_re_ca,
           nrow = 2,
