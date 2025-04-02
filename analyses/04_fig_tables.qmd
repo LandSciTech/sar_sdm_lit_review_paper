@@ -160,7 +160,7 @@ first_cc <- paper_db %>% filter (cc_sdm_na == "1") %>% filter (year_published ==
 rm(first_cc, first_sdm, sdm_na, sdm_ca, cc_sdm_ca, cc_sdm_na)
 ```
 
-**Figure 2**
+**Figure 1**
 
 ```{r, echo = FALSE}
 
@@ -639,7 +639,7 @@ sarsdm %>%
   kable()
 ```
 
-**Figure 3**
+**Figure 2**
 
 ```{r, echo = FALSE}
 
@@ -822,14 +822,14 @@ fig_temp_trend_prop_doc_ld <- plot_grid(fig_pnl_temp_trends_ld,
 ```
 
 ```{r}
-#save figure 3
+#save figure 2
 jpeg(paste0(path,"/figures/fig_ld_temp_trends_and_prop_ld.jpeg"), units = "in", 
      width = 5, height = 5, res = 1000)
 fig_temp_trend_prop_doc_ld
 dev.off()
 ```
 
-**Figure 4**
+**Figure 3**
 
 ```{r, echo = FALSE}
 #| fig-cap: "Version 1: Number of listing documents that used SDMs (with climate change projections (SDM-CC) and without (SDM-No)) for each of the six applications examined. The application of SDMs for the assessment of threats to species is separated into whether they were used in the assessment of the threat of climate change (Threat: CC) or all other threats (Threats: Other). Each listing document could have SDMs used for multiple applications, thus the sum could be greater than the total documents with SDM-CC (n = 26) in the left panel, and SDM-No CC without CC (n = 54) in the right panel."
@@ -888,7 +888,7 @@ rm(fig_pnl_prop_doc_sdms_ld, fig_pnl_temp_trends_ld,
    )
 ```
 
-**Figure 4**
+**Figure 3**
 
 ```{r}
 # save figure 4V1
@@ -997,7 +997,7 @@ fig_ldtype_doc_comb_sdm <- fig_ldtype_doc_sdm_comb_ld %>%
 ```
 
 ```{r}
-# save figure 4V2
+# save figure V2
 jpeg(paste0(path,"/figures/fig_ld_sdm_applications_V2.jpeg"), units="in", width=5, height=5, res=1000)
 plot_grid(get_plot_component(fig_ldtype_doc_comb_sdm, "guide-box", 
                              return_all = TRUE)[[3]],
@@ -1012,7 +1012,7 @@ dev.off()
 rm(fig_pnl_sdm_uses_ld)
 ```
 
-**Availability vs use analysis**
+## 3.3 Availability vs use of SDM-CC papers
 
 ```{r, echo = FALSE}
 
@@ -1142,7 +1142,7 @@ sarsdm %>%
   kable()
 ```
 
-## 3.3 Trends in available SDM literature
+## 3.4 Trends in available SDM literature
 
 **Summary of number of papers obtained and species included**
 
@@ -1416,7 +1416,7 @@ na_db %>%
   kable()
 ```
 
-**Figure 5**
+**Figure 4**
 
 ```{r, echo = FALSE}
 #get data showing number of papers that fit each category (SDM, SDM-CC, and Canada-inclusive)
@@ -1522,10 +1522,8 @@ fig_pnl_prop_sp_model <- na_db_alt %>%
   coord_flip()
 ```
 
-Figure 5:
-
 ```{r, echo = FALSE}
-#| fig-cap: "A) Number of SDM papers obtained during the literature review that include each taxonomic group, broken down by SDMs that include climate change projections (SDM-CC, blue) and all other SDMs (SDM-No CC, green), as well as whether the papers were Canada-exclusive (dark colours) or Canada-inclusive (light colours). Canada-inclusivity and exclusivity represents whether data from at least a portion of the species’ Canadian range was included when building the SDM. Papers could model species from multiple taxonomic groups, thus the sum of the number of papers across groups will be greater than the total number of SDM papers (n = 176). B) Proportion of species in each taxonomic group we found through the literature review to not be included in any peer-reviewed SDMs (no SDM, grey), or that were included in at least one SDM-No CC (blue), SDM-CC (green), or both types of models (SDM-CC & SDM-No CC, purple). Proportion of species in any SDM = sum of proportion of species across the three SDM groups. Proportions are based on the total number of species in each group (number at right end of bars). The proportion of species by taxonomic group included in Canada-inclusive SDMs is almost indistinguishable and thus not shown here (see Figure S2). * Note that a partial literature review was completed for Birds (see Section 2.2)"
+#| fig-cap: "A) Number of SDM papers obtained during the literature review that include each taxonomic group, broken down by SDMs that include climate change projections (SDM-CC, blue) and all other SDMs (SDM-No CC, green), as well as whether the papers were Canada-exclusive (dark colours) or Canada-inclusive (light colours). Canada-inclusivity and exclusivity represents whether data from at least a portion of the species’ Canadian range was included when building the SDM. Papers could model species from multiple taxonomic groups, thus the sum of the number of papers across groups will be greater than the total number of SDM papers (n = 176). B) Proportion of species in each taxonomic group we found through the literature review to not be included in any peer-reviewed SDMs (no SDM, grey), or that were included in at least one SDM-No CC (blue), SDM-CC (green), or both types of models (SDM-CC & SDM-No CC, purple). Proportion of species in any SDM = sum of proportion of species across the three SDM groups. Proportions are based on the total number of species in each group (number at right end of bars). The proportion of species by taxonomic group included in Canada-inclusive SDMs is almost indistinguishable and thus not shown here (see Figure S3). * Note that a partial literature review was completed for Birds (see Section 2.2)"
 #| fig-width: 6
 #| fig-height: 4
 
@@ -1537,7 +1535,7 @@ plot_grid(fig_pnl_num_ppr,
 ```
 
 ```{r}
-#save figure 5 version 1
+#save figure
 jpeg(paste0(path,"/figures/fig_num_ppr_and_prop_sp_by_taxa.jpeg"), units="in", width=6, height=4, res=1000)
 plot_grid(fig_pnl_num_ppr,
           fig_pnl_prop_sp_model,
@@ -1624,7 +1622,7 @@ re_db %>%
   kable()
 ```
 
-**Figure 6**
+**Figure 5**
 
 ```{r, echo = FALSE}
 # get binned research effort data
@@ -1783,7 +1781,7 @@ plot_grid(fig_pnl_sdm_re, fig_pnl_cc_sdm_re,
 ```
 
 ```{r}
-#save figure 6
+#save figure
 jpeg(paste0(path,"/figures/fig_research_effort.jpeg"), units="in", width=6, height=4, res=1000)
 plot_grid(fig_pnl_sdm_re, fig_pnl_cc_sdm_re,
           nrow = 2,
@@ -1791,9 +1789,9 @@ plot_grid(fig_pnl_sdm_re, fig_pnl_cc_sdm_re,
 dev.off()
 ```
 
-### 3.3.1 Inclusion and research effort models
+## 3.5 Inclusion and research effort regression models
 
-**Figure 7**
+**Figure 6**
 
 ```{r, echo = FALSE}
 #| fig-cap: "A) Standardized effect sizes (coefficients and 95% confidence intervals[CI]) from A) the SDM inclusion model, B) the SDM-CC inclusion model, C) SDM research effort model, D) SDM-CC research model. SDM and SDM-CC inclusion GLMs predict probability of inclusion in a SDM or SDM-CC paper based on whether a paper that includes the species was obtained in the literature review, and were built with a Binomial distribution and logit link. SDM and SDM-CC research effort GLMs predict the number of SDM or SDM-CC papers that include each species, based on the results of the literature review, and were built with a Quasipoisson distribution with a log link. The four models share most of the same covariates: taxonomic group (8 levels; Amphibians excluded from SDM inclusion model, Birds excluded from both research effort models), SARA status (3 levels), range size (square root transformed for SDM inclusion model and both research effort models, log transformed in SDM-CC inclusion model), and year of listing under SARA. SDM-CC inclusion and research effort models include an additional covariate - whether climate change was listed as a threat in the species’ Canadian policy documents (CC threat; Y/N). Symbols in all panels reflect modelled covariate groupings. In all models, the reference level for taxonomic group is ‘Arthropods’, for SARA status it is ‘Special Concern’ and in the SDM-CC inclusion and research effort models, the reference level for CC threat is ‘No’.  For more details see Tables S4-S7."
@@ -2027,7 +2025,7 @@ cowplot::plot_grid(m1_plt, m2_plt, m7_plt, m8_plt, nrow = 2, labels = c('A', 'B'
 ```
 
 ```{r}
-#save figure 7
+#save figure
 jpeg(paste0(path,"/figures/fig_glm_results.jpeg"), units="in", width=10, height=8, res=1000)
 cowplot::plot_grid(m1_plt, m2_plt, m7_plt, m8_plt, nrow = 2, labels = c('A', 'B', 'C', 'D'))
 dev.off()
