@@ -1009,8 +1009,7 @@ dev.off()
 
 ```{r, echo = FALSE}
 #clean environment
-rm(fig_pnl_sdm_uses_ld,
-   cc_sdm_sections, oth_sdm_sections)
+rm(fig_pnl_sdm_uses_ld)
 ```
 
 **Availability vs use analysis**
@@ -2415,7 +2414,69 @@ rm(glm_db, sp_10p_range, sp_90p_range, range_quantile_10, range_quantile_90,
 
 ## Supplementary Figures
 
-**Figure S1** is the PRISMA diagram. This figure is created using a Word Doc template in the /figures folder.
+**Figure S1** is the PRISMA diagram. This figure is created using a Word Doc template in the /figures folder, and stats provided from section 3.1 of this doc.
+
+**Figure S2**
+
+```{r, echo = FALSE}
+#| fig-cap: "Applications of SDMs in listing documents, separated by the three types of listing documents and whether the SDM used included climate change projections (SDM-CC; green) or did not (SDM-no CC; blue). SDMs were included in 42/466 (9%) of Status Reports, 7/92 (8%) of Management Plans, and 23/302 (8%) of Recovery Strategies."
+# get data for supp figure showing applications of SDMs by listing document type
+
+supp_fig_pnl_sdm_uses_ld_by_doctype <- bind_rows(cc_sdm_sections, oth_sdm_sections) %>%
+  mutate(sdm_label = factor(sdm_type,
+                            levels = c("CC-SDM",
+                                       "OTH-SDM"),
+                            labels = c("SDM-CC",
+                                       "SDM-No CC")),
+         section = factor(section,
+                          levels = c("Other",
+                                     "Critical Habitat",
+                                     "Strategies",
+                                     "Threats",
+                                     "Species Information")),
+         colour = factor(colour,
+                         levels = c("Other",
+                                    "Critical Habitat",
+                                    "Strategies",
+                                    "Threats: Other",
+                                    "Threats: CC",
+                                    "Species Information")),
+         doc_type = factor(doc_type,
+                           levels = c("COSEWIC Status Reports",
+                                      "Management Plans",
+                                      "Recovery Strategies"),
+                           labels = c("Status Reports",
+                                      "Management Plans",
+                                      "Recovery Strategies"))) %>%
+  ggplot(aes(x = colour, y = n_doc, fill = sdm_label)) +
+  geom_col() +
+  #geom_text(aes(label = n_doc))+
+  # colours if using the application types as colours
+  scale_fill_manual(values = c('#2c9320', #SDM-CC
+                               '#1c63a5' # SDM-No CC
+                               ), drop = TRUE) +
+  ylab("Number of documents") +
+  xlab(element_blank()) +
+  guides(fill = guide_legend(reverse=T)) +
+  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
+  coord_flip() +
+  theme_classic() +
+  theme(axis.text = element_text(size=10),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 9),
+        legend.position = "top") +
+  facet_wrap(vars(doc_type))
+
+supp_fig_pnl_sdm_uses_ld_by_doctype
+
+```
+
+```{r, echo = FALSE}
+# save figure S2
+jpeg(paste0(path,"/figures/supp_ld_sdm_applications_by_doctype.jpeg"), units="in", width=6, height=3, res=800)
+supp_fig_pnl_sdm_uses_ld_by_doctype
+dev.off()
+```
 
 **Figure S2**
 
