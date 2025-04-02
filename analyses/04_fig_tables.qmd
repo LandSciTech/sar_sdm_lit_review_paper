@@ -2846,7 +2846,37 @@ dev.off()
 
 ## Supplementary Tables
 
-**Table S1**
+**Table S1** is a list of bird species and whether they were targeted in the literature review. 
+
+**Table S2-S5** present results from the alternate versions of the regression models examining inclusion and research effort for North American SDMs. These alternate version use the other transformation of range size. These tables are the result of the script supp01_stat_analysis_alt_rangesize_transformation.R, and can be found at the following file path:
+
+-   Table S2: sarsdm/outputs/model_results/model1_alt_rangesize.csv
+-   Table S3: sarsdm/outputs/model_results/model2_alt_rangesize.csv
+-   Table S4: sarsdm/outputs/model_results/model7_alt_rangesize.csv
+-   Table S5: sarsdm/outputs/model_results/model8_alt_rangesize.csv
+
+**Tables S6-S9** are results from each of the Canada-inclusive GLMs, only shown in the Supplementary. They are written and saved as part of the statistical analysis code, and can be found at the the following file path:
+
+-   Table S6: sarsdm/outputs/model_results/model3.csv
+-   Table S7: sarsdm/outputs/model_results/model4.csv
+-   Table S8: sarsdm/outputs/model_results/model5.csv
+-   Table S9: sarsdm/outputs/model_results/model6.csv
+
+**Tables S10-S13** are results from each of the Canada-inclusive GLMs, only shown in the Supplementary. They are written and saved as part of the statistical analysis code, and can be found at the the following file path:
+
+-   Table S10: sarsdm/outputs/model_results/model3_alt_rangesize.csv
+-   Table S11: sarsdm/outputs/model_results/model4_alt_rangesize.csv
+-   Table S12: sarsdm/outputs/model_results/model5_alt_rangesize.csv
+-   Table S13: sarsdm/outputs/model_results/model6_alt_rangesize.csv
+
+**Table S14-S17** are results from each of the North American GLMs discussed in the main text of the paper, and shown in the Figure in the main tedxt. They are written and saved as part of the statistical analysis code, and can be found at the following file path:
+
+-   Table S14: sarsdm/outputs/model_results/model1.csv
+-   Table S15: sarsdm/outputs/model_results/model2.csv
+-   Table S16: sarsdm/outputs/model_results/model7.csv
+-   Table S17: sarsdm/outputs/model_results/model8.csv
+
+**Table S18**
 
 ```{r, echo = FALSE}
 # tbl-cap: "Number and proportion (in brackets) of listing documents that included different combinations of SDMs in a single document, by taxa. Total listing documents represent the total number of documents that target species in the taxa. No SDMs = no SDMs found in the document. SDM-No CC = at least one SDM without a climate change projection was used in the document, and no SDM-CC was found in that document. SDM-CC = at least one CC-SDM was used in the document, and no SDM without a climate change projection was used. SDM-CC & SDM-No CC = SDMs with and without climate change projections were used in the same document. Proportions are based on the total listing documents for the taxa."
@@ -2862,7 +2892,7 @@ supp_table_taxa_doc_sdms %>% kable()
 write.csv(supp_table_taxa_doc_sdms, paste0(path,"/outputs/supp_table_ld_docs_sdm_taxa_summary.csv"))
 ```
 
-**Table S2**
+**Table S19**
 
 ```{r, echo = FALSE}
 #| tbl-cap: "Number and proportion (in brackets) of listing documents that included different combinations of SDMs in a single document, by type of listing document. Total listing documents represent the total number of documents of that type. No SDMs = no SDMs found in the document. SDM-No CC = at least one SDM without a climate change projection was used in the document, and no SDM-CC was found in that document. SDM-CC = at least one CC-SDM was used in the document, and no SDM without a climate change projection was used. SDM-CC & SDM-No CC = SDMs with and without climate change projections were used in the same document. Proportions are based on the total listing documents of that type."
@@ -2880,7 +2910,7 @@ supp_tbl_ldtype_doc_sdm_comb_ld %>% kable()
 write.csv(supp_tbl_ldtype_doc_sdm_comb_ld, paste0(path,"/outputs/supp_table_ld_docs_sdm_ldtype_summary.csv"))
 ```
 
-**Table S3**
+**Table S20**
 
 ```{r, echo = FALSE}
 #| tbl-cap: "Number of species from each taxa for which at least one paper from each criteria was obtained in the literature review. Canada-inclusive SDMs and SDM-CC are models that include species occurrence data from all or a portion of the Canadian range. Taxonomic groups where there were species that were only modelled outside of Canada in either SDMs or SDM-CC are bolded. Also includes a field indicating the total number of species in each taxa. Species only included in Canada-exclusive SDM: rusty-patched bumble bee (Bombus affinis), pink-footed shearwater (Ardenna creatopus), flammulated owl (Otus flammeolus), black-footed albatross (Phoebastria nigripes), spotted owl carurina subspecies (Strix occidentalis caurina), black-foam lichen (Anzia colpodes), cherry birch (Betula lenta), spotted wintergreen (Chimaphila maculata), round-leaved greenbrier (Smilax rotundifolia), and deerberry (Vaccinium stamineum). Species only included in Canada-exclusive SDM-CC: flammulated owl (Otus flammeolus), spotted owl carurina subspecies (Strix occidentalis caurina), cherry birch (Betula lenta),  spotted wintergreen (Chimaphila maculata), round-leaved greenbrier (Smilax rotundifolia), deerberry (Vaccinium stamineum), blue ash (Fraxinus quadrangulata), kentucky coffee-tree (Gymnocladus dioicus), cucumber tree (Magnolia acuminata) and red mulberry (Morus rubra)."
@@ -2959,7 +2989,7 @@ tbl_sp_model <- tbl_sp_model %>%
 write.csv(tbl_sp_model, paste0(path,"/outputs/ls_na_v_ca_sp.csv"))
 ```
 
-To get information for caption for Table S3, we need to know which species are only included in Canada-exclusive models.
+To get information for caption for Table S20, we need to know which species are only included in Canada-exclusive models.
 
 ```{r, echo = FALSE}
 #| tbl-cap: "Species only included in Canada-exclusive SDM papers"
@@ -2978,21 +3008,7 @@ sarsdm %>%
   arrange(taxonomic_group) %>% kable()
 ```
 
-**Table S4-S7** are results from each of the North American GLMs discussed in the main text of the paper, and shown in the Figure in the main tedxt. They are written and saved as part of the statistical analysis code, and can be found at the following file path:
-
--   Table S4: sarsdm/outputs/model_results/model1.csv
--   Table S5: sarsdm/outputs/model_results/model2.csv
--   Table S6: sarsdm/outputs/model_results/model7.csv
--   Table S7: sarsdm/outputs/model_results/model8.csv
-
-**Tables S8-S11** are results from each of the Canada-inclusive GLMs, only shown in the Supplementary. They are written and saved as part of the statistical analysis code, and can be found at the the following file path:
-
--   Table S8: sarsdm/outputs/model_results/model3.csv
--   Table S9: sarsdm/outputs/model_results/model4.csv
--   Table S10: sarsdm/outputs/model_results/model5.csv
--   Table S11: sarsdm/outputs/model_results/model6.csv
-
-\*Table S12\*\*
+**Table S21**
 
 ```{r, echo = FALSE}
 #| tbl-cap: "For species where North American RSF papers were obtained in the literature review, a contrast of the number of SDM papers (i.e., the papers included in our analyses) and the number of RSF papers excluded from the analysis. The number of RSF papers only considers papers that follow the rest of the criteria for inclusion in analysis: include North America in their geographic extent, were published before 2023, and excludes RSF papers that model closely related species to the species listed at risk (e.g., papers that model parent species of subspecies). A single RSF paper could include more than one species, therefore the sum of the ‘Number of RSF’ papers column could be greater than the total number of North American RSF papers (n = 58)."
