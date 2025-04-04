@@ -644,7 +644,7 @@ sarsdm %>%
 ```{r, echo = FALSE}
 #| tbl-cap: "Types of listing documents vs the number of documents (n_doc_X) that used a SDM (any type) for each of the sections/applications examined. ch = critical habitat, oth = other, th = threats (any), si = species information, str = strategies. "
 
-sarsdm <- sarsdm %>% filter (ld_sdm == "1") %>%
+sarsdm2 <- sarsdm %>% filter (ld_sdm == "1") %>%
   # create binary columns showing whether a SDM (any type) was used in each of the sections
   mutate(ld_section_si = as.numeric(grepl('SI', X2_cc_sdm_section) | grepl('SI', X2_other_sdm_section)), #species information
          ld_section_th = as.numeric(grepl('TH', X2_cc_sdm_section) | grepl('TH', X2_other_sdm_section)), #threats (any)
@@ -654,7 +654,7 @@ sarsdm <- sarsdm %>% filter (ld_sdm == "1") %>%
 
 # create information summarizing the number of times each application was used
 # species information
-app_by_doc_si <- sarsdm %>%
+app_by_doc_si <- sarsdm2 %>%
   group_by(doc_type, ld_section_si) %>%
   mutate(n_doc_si = n_distinct(rowID)) %>%
   ungroup() %>%
@@ -663,7 +663,7 @@ app_by_doc_si <- sarsdm %>%
   unique()
 
 # threats (any)
-app_by_doc_th <- sarsdm %>%
+app_by_doc_th <- sarsdm2 %>%
   group_by(doc_type, ld_section_th) %>%
   mutate(n_doc_th = n_distinct(rowID)) %>%
   ungroup() %>%
@@ -672,7 +672,7 @@ app_by_doc_th <- sarsdm %>%
   unique()
 
 # critical habitat
-app_by_doc_ch <- sarsdm %>%
+app_by_doc_ch <- sarsdm2 %>%
   group_by(doc_type, ld_section_ch) %>%
   mutate(n_doc_ch = n_distinct(rowID)) %>%
   ungroup() %>%
@@ -681,7 +681,7 @@ app_by_doc_ch <- sarsdm %>%
   unique()
 
 # strategies
-app_by_doc_str <- sarsdm %>%
+app_by_doc_str <- sarsdm2 %>%
   group_by(doc_type, ld_section_str) %>%
   mutate(n_doc_str = n_distinct(rowID)) %>%
   ungroup() %>%
@@ -690,7 +690,7 @@ app_by_doc_str <- sarsdm %>%
   unique()
 
 # others
-app_by_doc_oth <- sarsdm %>%
+app_by_doc_oth <- sarsdm2 %>%
   group_by(doc_type, ld_section_oth) %>%
   mutate(n_doc_oth = n_distinct(rowID)) %>%
   ungroup() %>%
