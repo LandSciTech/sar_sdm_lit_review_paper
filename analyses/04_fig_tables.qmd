@@ -2611,7 +2611,7 @@ supp_fig_pnl_sdm_uses_ld_by_taxgrp <- sdm_section_by_taxgrp %>%
   theme(axis.text = element_text(size=10),
         legend.title = element_blank(),
         legend.text = element_text(size = 9),
-        legend.position = "none", 
+        legend.position = "top", 
         panel.border = element_rect(fill = NA)) 
 
 ```
