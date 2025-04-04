@@ -2550,6 +2550,79 @@ supp_fig_pnl_sdm_uses_ld_by_doctype
 dev.off()
 ```
 
+```{r}
+sdm_section_by_taxgrp <- sarsdm %>% 
+  select(rowID, species, taxonomic_group, X2_cc_sdm, X2_other_sdm, ld_sdm,
+         X2_cc_sdm_section, X2_other_sdm_section, 
+         X2_cc_sdm_cc_threat, X2_cc_sdm_oth_threat,
+         X2_other_sdm_cc_threat, X2_other_sdm_oth_threat) %>% 
+  filter(ld_sdm != 0) %>% 
+  mutate(
+    X2_cc_sdm_section = ifelse(
+      X2_cc_sdm_cc_threat == 1, 
+      str_replace_all(X2_cc_sdm_section, "THR", "THR:CC"),
+      str_replace_all(X2_cc_sdm_section, "THR", "THR:Other")
+    ),
+    X2_other_sdm_section = ifelse(
+      X2_other_sdm_cc_threat == 1, 
+      str_replace_all(X2_other_sdm_section, "THR", "THR:CC"),
+      str_replace_all(X2_other_sdm_section,"THR", "THR:Other")
+    ) %>% # one species has both so adding it in
+      {ifelse(X2_other_sdm_oth_threat == 1 & !str_detect(., "THR:Other"),
+              paste0(., " ", "THR:Other"), .)}) %>% 
+  mutate(X2_cc_sdm = ifelse(X2_cc_sdm == 1, "cc", NA_character_),
+         X2_other_sdm = ifelse(X2_other_sdm == 1, "oth", NA_character_)) %>% 
+  unite(col = "sdm_type", X2_cc_sdm, X2_other_sdm, sep = ";", na.rm = TRUE, remove = TRUE) %>%
+  separate_longer_delim(cols = sdm_type, delim = ";") %>% 
+  mutate(sdm_section = ifelse(sdm_type == "cc", X2_cc_sdm_section, X2_other_sdm_section) %>% 
+           str_trim()) %>% 
+  select(-X2_other_sdm_section, -X2_cc_sdm_section) %>% 
+  separate_longer_delim(cols = sdm_section, delim = " ") 
+
+
+supp_fig_pnl_sdm_uses_ld_by_taxgrp <- sdm_section_by_taxgrp %>% 
+  mutate(sdm_type = factor(sdm_type,
+                            levels = c("cc",
+                                       "oth"),
+                            labels = c("SDM-CC",
+                                       "SDM-No CC")),
+         sdm_section = factor(sdm_section,
+                          levels = c("OTH", "CH", "STR", "THR:Other",
+                                     "THR:CC", "SI"),
+                          labels = c("Other",
+                                    "Critical Habitat",
+                                    "Strategies",
+                                    "Threats: Other",
+                                    "Threats: CC",
+                                    "Species Information"))) %>%
+  ggplot(aes(x = sdm_section, fill = sdm_type)) +
+  geom_bar() +
+  # colours if using the application types as colours
+  scale_fill_manual(values = c('#2c9320', #SDM-CC
+                               '#1c63a5' # SDM-No CC
+                               ), drop = TRUE) +
+  ylab("Number of documents") +
+  xlab(element_blank()) +
+  guides(fill = guide_legend(reverse=T)) +
+  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
+  coord_flip() +
+  facet_wrap(~taxonomic_group, nrow = 2)+
+  theme_classic() +
+  theme(axis.text = element_text(size=10),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 9),
+        legend.position = "none", 
+        panel.border = element_rect(fill = NA)) 
+
+```
+
+```{r, echo = FALSE}
+# save figure S2
+jpeg(paste0(path,"/figures/supp_ld_sdm_applications_by_taxgrp.jpeg"), units="in", width=7, height=6, res=800)
+supp_fig_pnl_sdm_uses_ld_by_taxgrp
+dev.off()
+```
+
 **Figure S3**
 
 ```{r, echo = FALSE}
