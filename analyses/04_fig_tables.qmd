@@ -890,14 +890,14 @@ fig_temp_trend_prop_doc_ld <- plot_grid(fig_pnl_temp_trends_ld,
 ```
 
 ```{r}
-#save figure 2
-jpeg(paste0(path,"/figures/fig_ld_temp_trends_and_prop_ld.jpeg"), units = "in", 
-     width = 5, height = 5, res = 1000)
-fig_temp_trend_prop_doc_ld
-dev.off()
+# #save figure 2
+# jpeg(paste0(path,"/figures/fig_ld_temp_trends_and_prop_ld.jpeg"), units = "in", 
+#      width = 5, height = 5, res = 1000)
+# fig_temp_trend_prop_doc_ld
+# dev.off()
 ```
 
-**Figure 3**
+**Figure 2 cont**
 
 ```{r, echo = FALSE}
 #| fig-cap: "Version 1: Number of listing documents that used SDMs (with climate change projections (SDM-CC) and without (SDM-No)) for each of the six applications examined. The application of SDMs for the assessment of threats to species is separated into whether they were used in the assessment of the threat of climate change (Threat: CC) or all other threats (Threats: Other). Each listing document could have SDMs used for multiple applications, thus the sum could be greater than the total documents with SDM-CC (n = 26) in the left panel, and SDM-No CC without CC (n = 54) in the right panel."
@@ -951,9 +951,7 @@ dev.off()
 
 ```{r, echo = FALSE}
 #clean environment
-rm(fig_pnl_prop_doc_sdms_ld, fig_pnl_temp_trends_ld,
-   ld_temp_trends, ld_sdm_temp_trends, ld_oth_sdm_temp_trends, ld_cc_sdm_temp_trends
-   )
+
 ```
 
 **Figure 3**
@@ -1062,6 +1060,16 @@ fig_ldtype_doc_comb_sdm <- fig_ldtype_doc_sdm_comb_ld %>%
         legend.position = "bottom")
 
 
+fig_ld_stats <- plot_grid(fig_pnl_temp_trends_ld,
+                          leg[[3]],
+                          fig_pnl_prop_doc_sdms_ld+
+                            theme(legend.position = "none"),
+                          fig_ldtype_doc_comb_sdm+guides(fill = "none"),
+                          fig_pnl_sdm_uses_ld,
+                          nrow = 5,
+                          rel_heights = c(0.24, 0.04, 0.24, 0.24, 0.24),
+                          labels = c("A", "","B", "C", "D"))
+fig_ld_stats
 ```
 
 ```{r}
@@ -1069,7 +1077,7 @@ fig_ldtype_doc_comb_sdm <- fig_ldtype_doc_sdm_comb_ld %>%
 jpeg(paste0(path,"/figures/fig_ld_sdm_applications_V2.jpeg"), units="in", width=5, height=5, res=1000)
 plot_grid(get_plot_component(fig_ldtype_doc_comb_sdm, "guide-box", 
                              return_all = TRUE)[[3]],
-          fig_ldtype_doc_comb_sdm+guides(fill = "none"), fig_pnl_sdm_uses_ld, 
+           
           rel_heights = c(0.05, 0.35, 0.6),
           nrow = 3, labels = c("", "A", "B"))
 dev.off()
@@ -2912,7 +2920,7 @@ dev.off()
 
 ## Supplementary Tables
 
-**Table S1** is a list of bird species and whether they were targeted in the literature review. 
+**Table S1** is a list of bird species and whether they were targeted in the literature review.
 
 **Table S2-S5** present results from the alternate versions of the regression models examining inclusion and research effort for North American SDMs. These alternate version use the other transformation of range size. These tables are the result of the script supp01_stat_analysis_alt_rangesize_transformation.R, and can be found at the following file path:
 
