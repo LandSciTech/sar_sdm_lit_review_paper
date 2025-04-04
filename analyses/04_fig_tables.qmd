@@ -1067,19 +1067,17 @@ fig_ld_stats <- plot_grid(fig_pnl_temp_trends_ld,
                           fig_ldtype_doc_comb_sdm+guides(fill = "none"),
                           fig_pnl_sdm_uses_ld,
                           nrow = 5,
-                          rel_heights = c(0.24, 0.04, 0.24, 0.24, 0.24),
+                          align = "v",
+                          axis = "l",
+                          rel_heights = c(0.24, 0.04, 0.31, 0.16, 0.25),
                           labels = c("A", "","B", "C", "D"))
 fig_ld_stats
 ```
 
 ```{r}
 # save figure V2
-jpeg(paste0(path,"/figures/fig_ld_sdm_applications_V2.jpeg"), units="in", width=5, height=5, res=1000)
-plot_grid(get_plot_component(fig_ldtype_doc_comb_sdm, "guide-box", 
-                             return_all = TRUE)[[3]],
-           
-          rel_heights = c(0.05, 0.35, 0.6),
-          nrow = 3, labels = c("", "A", "B"))
+jpeg(paste0(path,"/figures/fig_ld_stats.jpeg"), units="in", width=5, height=8, res=1000)
+fig_ld_stats
 dev.off()
 ```
 
