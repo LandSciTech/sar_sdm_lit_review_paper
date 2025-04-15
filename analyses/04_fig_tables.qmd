@@ -363,9 +363,13 @@ ld_other_sdm <- sarsdm %>% filter (X2_other_sdm == "1")
 
 -   Number of species with SDM-No CC in at least one of their listing documents: `r n_distinct(ld_other_sdm$species)`
 
+-   Number of DUs with SDM-No CC in at least one of their listing documents: `r n_distinct(ld_other_sdm$speciesID)`
+
 -   Number of documents with CC-SDM: `r nrow(ld_cc_sdm)`
 
 -   Number of species with a CC-SDM in at least one of their listing documents: `r n_distinct(ld_cc_sdm$species)`
+
+-   Number of DUs with SDM-CC in at least one of their listing documents: `r n_distinct(ld_cc_sdm$speciesID)`
 
 **Variation in SDM inclusion by document type:**
 
