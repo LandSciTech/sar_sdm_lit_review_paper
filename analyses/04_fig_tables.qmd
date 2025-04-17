@@ -1325,6 +1325,49 @@ paper_db %>%
          p_present = proj_present) %>% kable()
 ```
 
+**Proportion of species included in at least one paper by taxa**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number (n) and proportion (prop_taxa) of species in each taxonomic group with SDMs. Proportions are based on total number of species in each group."
+
+# total number of species per taxa
+sp_taxa <- sarsdm %>%
+  group_by(taxonomic_group) %>%
+  summarise (n_taxa = n_distinct(species))
+
+na_db <- sarsdm %>%
+  group_by(taxonomic_group, cc_sdm, sdm) %>%
+  summarise(n = n_distinct(species)) %>%
+  ungroup() %>%
+  mutate(label = paste0(cc_sdm, sdm),
+         label = factor(label,
+                        levels = c("00", "11","01"),
+                        labels = c("No SDM","SDM-CC", "SDM-No CC only")),
+         scope = c("North America"))
+
+na_db <- merge(na_db, sp_taxa, by = "taxonomic_group") %>%
+  mutate(prop_taxa = n/n_taxa)
+
+na_db %>%
+  mutate(prop_taxa = round(prop_taxa, digits = 2)) %>%
+  select(taxonomic_group, label, n, prop_taxa) %>%
+  kable()
+```
+
+**Number of SDM papers by taxa**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of SDM papers that included at least one species from each taxonomic group. Note that a partial literature review was completed for Birds"
+
+paper_db %>%
+  filter (sdm_na == "1") %>%
+  group_by(taxonomic_group) %>%
+  summarise (n_ppr = n_distinct(paperID)) %>% 
+  arrange(n_ppr) %>%
+  kable()
+
+```
+
 **FUll vs partial range in SDM papers**
 
 ```{r, echo = FALSE}
@@ -1525,49 +1568,6 @@ The paper: `r unique(max_n_sar_ppr$doc_citation)`
 rm(max_n_sar_ppr, 
    n_sar_sdm,
    n_sar_cc_sdm)
-```
-
-**Proportion of species included in at least one paper by taxa**
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number (n) and proportion (prop_taxa) of species in each taxonomic group with SDMs. Proportions are based on total number of species in each group."
-
-# total number of species per taxa
-sp_taxa <- sarsdm %>%
-  group_by(taxonomic_group) %>%
-  summarise (n_taxa = n_distinct(species))
-
-na_db <- sarsdm %>%
-  group_by(taxonomic_group, cc_sdm, sdm) %>%
-  summarise(n = n_distinct(species)) %>%
-  ungroup() %>%
-  mutate(label = paste0(cc_sdm, sdm),
-         label = factor(label,
-                        levels = c("00", "11","01"),
-                        labels = c("No SDM","SDM-CC", "SDM-No CC only")),
-         scope = c("North America"))
-
-na_db <- merge(na_db, sp_taxa, by = "taxonomic_group") %>%
-  mutate(prop_taxa = n/n_taxa)
-
-na_db %>%
-  mutate(prop_taxa = round(prop_taxa, digits = 2)) %>%
-  select(taxonomic_group, label, n, prop_taxa) %>%
-  kable()
-```
-
-**Research effort by taxa**
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of SDM papers that included at least one species from each taxonomic group"
-
-paper_db %>%
-  filter (sdm_na == "1") %>%
-  group_by(taxonomic_group) %>%
-  summarise (n_ppr = n_distinct(paperID)) %>% 
-  arrange(n_ppr) %>%
-  kable()
-
 ```
 
 **Figure 4**
