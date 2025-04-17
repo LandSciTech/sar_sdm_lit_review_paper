@@ -648,7 +648,7 @@ sarsdm %>%
 ```{r, echo = FALSE}
 #| tbl-cap: "Types of listing documents vs the number of documents (n_doc_X) that used a SDM (any type) for each of the sections/applications examined. ch = critical habitat, oth = other, th = threats (any), si = species information, str = strategies. "
 
-sarsdm <- sarsdm %>% filter (ld_sdm == "1") %>%
+sarsdm2 <- sarsdm %>% filter (ld_sdm == "1") %>%
   # create binary columns showing whether a SDM (any type) was used in each of the sections
   mutate(ld_section_si = as.numeric(grepl('SI', X2_cc_sdm_section) | grepl('SI', X2_other_sdm_section)), #species information
          ld_section_th = as.numeric(grepl('TH', X2_cc_sdm_section) | grepl('TH', X2_other_sdm_section)), #threats (any)
@@ -658,7 +658,7 @@ sarsdm <- sarsdm %>% filter (ld_sdm == "1") %>%
 
 # create information summarizing the number of times each application was used
 # species information
-app_by_doc_si <- sarsdm %>%
+app_by_doc_si <- sarsdm2 %>%
   group_by(doc_type, ld_section_si) %>%
   mutate(n_doc_si = n_distinct(rowID)) %>%
   ungroup() %>%
@@ -667,7 +667,7 @@ app_by_doc_si <- sarsdm %>%
   unique()
 
 # threats (any)
-app_by_doc_th <- sarsdm %>%
+app_by_doc_th <- sarsdm2 %>%
   group_by(doc_type, ld_section_th) %>%
   mutate(n_doc_th = n_distinct(rowID)) %>%
   ungroup() %>%
@@ -676,7 +676,7 @@ app_by_doc_th <- sarsdm %>%
   unique()
 
 # critical habitat
-app_by_doc_ch <- sarsdm %>%
+app_by_doc_ch <- sarsdm2 %>%
   group_by(doc_type, ld_section_ch) %>%
   mutate(n_doc_ch = n_distinct(rowID)) %>%
   ungroup() %>%
@@ -685,7 +685,7 @@ app_by_doc_ch <- sarsdm %>%
   unique()
 
 # strategies
-app_by_doc_str <- sarsdm %>%
+app_by_doc_str <- sarsdm2 %>%
   group_by(doc_type, ld_section_str) %>%
   mutate(n_doc_str = n_distinct(rowID)) %>%
   ungroup() %>%
@@ -694,7 +694,7 @@ app_by_doc_str <- sarsdm %>%
   unique()
 
 # others
-app_by_doc_oth <- sarsdm %>%
+app_by_doc_oth <- sarsdm2 %>%
   group_by(doc_type, ld_section_oth) %>%
   mutate(n_doc_oth = n_distinct(rowID)) %>%
   ungroup() %>%
@@ -894,14 +894,14 @@ fig_temp_trend_prop_doc_ld <- plot_grid(fig_pnl_temp_trends_ld,
 ```
 
 ```{r}
-#save figure 2
-jpeg(paste0(path,"/figures/fig_ld_temp_trends_and_prop_ld.jpeg"), units = "in", 
-     width = 5, height = 5, res = 1000)
-fig_temp_trend_prop_doc_ld
-dev.off()
+# #save figure 2
+# jpeg(paste0(path,"/figures/fig_ld_temp_trends_and_prop_ld.jpeg"), units = "in", 
+#      width = 5, height = 5, res = 1000)
+# fig_temp_trend_prop_doc_ld
+# dev.off()
 ```
 
-**Figure 3**
+**Figure 2 cont**
 
 ```{r, echo = FALSE}
 #| fig-cap: "Version 1: Number of listing documents that used SDMs (with climate change projections (SDM-CC) and without (SDM-No)) for each of the six applications examined. The application of SDMs for the assessment of threats to species is separated into whether they were used in the assessment of the threat of climate change (Threat: CC) or all other threats (Threats: Other). Each listing document could have SDMs used for multiple applications, thus the sum could be greater than the total documents with SDM-CC (n = 26) in the left panel, and SDM-No CC without CC (n = 54) in the right panel."
@@ -955,9 +955,7 @@ dev.off()
 
 ```{r, echo = FALSE}
 #clean environment
-rm(fig_pnl_prop_doc_sdms_ld, fig_pnl_temp_trends_ld,
-   ld_temp_trends, ld_sdm_temp_trends, ld_oth_sdm_temp_trends, ld_cc_sdm_temp_trends
-   )
+
 ```
 
 **Figure 3**
@@ -1066,16 +1064,24 @@ fig_ldtype_doc_comb_sdm <- fig_ldtype_doc_sdm_comb_ld %>%
         legend.position = "bottom")
 
 
+fig_ld_stats <- plot_grid(fig_pnl_temp_trends_ld,
+                          leg[[3]],
+                          fig_pnl_prop_doc_sdms_ld+
+                            theme(legend.position = "none"),
+                          fig_ldtype_doc_comb_sdm+guides(fill = "none"),
+                          fig_pnl_sdm_uses_ld,
+                          nrow = 5,
+                          align = "v",
+                          axis = "l",
+                          rel_heights = c(0.24, 0.04, 0.31, 0.16, 0.25),
+                          labels = c("A", "","B", "C", "D"))
+fig_ld_stats
 ```
 
 ```{r}
 # save figure V2
-jpeg(paste0(path,"/figures/fig_ld_sdm_applications_V2.jpeg"), units="in", width=5, height=5, res=1000)
-plot_grid(get_plot_component(fig_ldtype_doc_comb_sdm, "guide-box", 
-                             return_all = TRUE)[[3]],
-          fig_ldtype_doc_comb_sdm+guides(fill = "none"), fig_pnl_sdm_uses_ld, 
-          rel_heights = c(0.05, 0.35, 0.6),
-          nrow = 3, labels = c("", "A", "B"))
+jpeg(paste0(path,"/figures/fig_ld_stats.jpeg"), units="in", width=5, height=8, res=1000)
+fig_ld_stats
 dev.off()
 ```
 
@@ -2548,6 +2554,79 @@ supp_fig_pnl_sdm_uses_ld_by_doctype
 dev.off()
 ```
 
+```{r}
+sdm_section_by_taxgrp <- sarsdm %>% 
+  select(rowID, species, taxonomic_group, X2_cc_sdm, X2_other_sdm, ld_sdm,
+         X2_cc_sdm_section, X2_other_sdm_section, 
+         X2_cc_sdm_cc_threat, X2_cc_sdm_oth_threat,
+         X2_other_sdm_cc_threat, X2_other_sdm_oth_threat) %>% 
+  filter(ld_sdm != 0) %>% 
+  mutate(
+    X2_cc_sdm_section = ifelse(
+      X2_cc_sdm_cc_threat == 1, 
+      str_replace_all(X2_cc_sdm_section, "THR", "THR:CC"),
+      str_replace_all(X2_cc_sdm_section, "THR", "THR:Other")
+    ),
+    X2_other_sdm_section = ifelse(
+      X2_other_sdm_cc_threat == 1, 
+      str_replace_all(X2_other_sdm_section, "THR", "THR:CC"),
+      str_replace_all(X2_other_sdm_section,"THR", "THR:Other")
+    ) %>% # one species has both so adding it in
+      {ifelse(X2_other_sdm_oth_threat == 1 & !str_detect(., "THR:Other"),
+              paste0(., " ", "THR:Other"), .)}) %>% 
+  mutate(X2_cc_sdm = ifelse(X2_cc_sdm == 1, "cc", NA_character_),
+         X2_other_sdm = ifelse(X2_other_sdm == 1, "oth", NA_character_)) %>% 
+  unite(col = "sdm_type", X2_cc_sdm, X2_other_sdm, sep = ";", na.rm = TRUE, remove = TRUE) %>%
+  separate_longer_delim(cols = sdm_type, delim = ";") %>% 
+  mutate(sdm_section = ifelse(sdm_type == "cc", X2_cc_sdm_section, X2_other_sdm_section) %>% 
+           str_trim()) %>% 
+  select(-X2_other_sdm_section, -X2_cc_sdm_section) %>% 
+  separate_longer_delim(cols = sdm_section, delim = " ") 
+
+
+supp_fig_pnl_sdm_uses_ld_by_taxgrp <- sdm_section_by_taxgrp %>% 
+  mutate(sdm_type = factor(sdm_type,
+                            levels = c("cc",
+                                       "oth"),
+                            labels = c("SDM-CC",
+                                       "SDM-No CC")),
+         sdm_section = factor(sdm_section,
+                          levels = c("OTH", "CH", "STR", "THR:Other",
+                                     "THR:CC", "SI"),
+                          labels = c("Other",
+                                    "Critical Habitat",
+                                    "Strategies",
+                                    "Threats: Other",
+                                    "Threats: CC",
+                                    "Species Information"))) %>%
+  ggplot(aes(x = sdm_section, fill = sdm_type)) +
+  geom_bar() +
+  # colours if using the application types as colours
+  scale_fill_manual(values = c('#2c9320', #SDM-CC
+                               '#1c63a5' # SDM-No CC
+                               ), drop = TRUE) +
+  ylab("Number of documents") +
+  xlab(element_blank()) +
+  guides(fill = guide_legend(reverse=T)) +
+  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
+  coord_flip() +
+  facet_wrap(~taxonomic_group, nrow = 2)+
+  theme_classic() +
+  theme(axis.text = element_text(size=10),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 9),
+        legend.position = "top", 
+        panel.border = element_rect(fill = NA)) 
+
+```
+
+```{r, echo = FALSE}
+# save figure S2
+jpeg(paste0(path,"/figures/supp_ld_sdm_applications_by_taxgrp.jpeg"), units="in", width=7, height=6, res=800)
+supp_fig_pnl_sdm_uses_ld_by_taxgrp
+dev.off()
+```
+
 **Figure S3**
 
 ```{r, echo = FALSE}
@@ -2916,7 +2995,7 @@ dev.off()
 
 ## Supplementary Tables
 
-**Table S1** is a list of bird species and whether they were targeted in the literature review. 
+**Table S1** is a list of bird species and whether they were targeted in the literature review.
 
 **Table S2-S5** present results from the alternate versions of the regression models examining inclusion and research effort for North American SDMs. These alternate version use the other transformation of range size. These tables are the result of the script supp01_stat_analysis_alt_rangesize_transformation.R, and can be found at the following file path:
 
