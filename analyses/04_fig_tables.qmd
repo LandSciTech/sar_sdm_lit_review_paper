@@ -1368,6 +1368,28 @@ paper_db %>%
 
 ```
 
+**Number of Canada-inclusive SDM papers by taxa**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Total number of Canada-inclusive SDM papers by taxa"
+paper_db %>%
+  filter(sdm_ca == "1") %>%
+  group_by(taxonomic_group) %>%
+  summarise(n_ppr = n_distinct(paperID)) %>%
+  arrange(n_ppr) %>% kable()
+```
+
+**Number of Canada-inclusive SDM-CC papers by taxa**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Total number of Canada-inclusive SDM-CC papers by taxa"
+paper_db %>%
+  filter(cc_sdm_ca == "1") %>%
+  group_by(taxonomic_group) %>%
+  summarise(n_ppr = n_distinct(paperID)) %>%
+  arrange(n_ppr) %>% kable()
+```
+
 **FUll vs partial range in SDM papers**
 
 ```{r, echo = FALSE}
