@@ -1368,6 +1368,20 @@ paper_db %>%
 
 ```
 
+**Number of SDM-CC papers by taxa**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of SDM-CC papers that included at least one species from each taxonomic group. Note that a partial literature review was completed for Birds"
+
+paper_db %>%
+  filter (cc_sdm_na == "1") %>%
+  group_by(taxonomic_group) %>%
+  summarise (n_ppr = n_distinct(paperID)) %>% 
+  arrange(n_ppr) %>%
+  kable()
+
+```
+
 **Number of Canada-inclusive SDM papers by taxa**
 
 ```{r, echo = FALSE}
@@ -1385,6 +1399,28 @@ paper_db %>%
 #| tbl-cap: "Total number of Canada-inclusive SDM-CC papers by taxa"
 paper_db %>%
   filter(cc_sdm_ca == "1") %>%
+  group_by(taxonomic_group) %>%
+  summarise(n_ppr = n_distinct(paperID)) %>%
+  arrange(n_ppr) %>% kable()
+```
+
+**Number of Canada-exclusive SDM papers by taxa**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Total number of Canada-exclusive SDM papers by taxa"
+paper_db %>%
+  filter(sdm_na == "1" & sdm_ca == "0") %>%
+  group_by(taxonomic_group) %>%
+  summarise(n_ppr = n_distinct(paperID)) %>%
+  arrange(n_ppr) %>% kable()
+```
+
+**Number of Canada-exclusive SDM-CC papers by taxa**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Total number of Canada-exclusive SDM-CC papers by taxa"
+paper_db %>%
+  filter(cc_sdm_na == "1" & cc_sdm_ca == "0") %>%
   group_by(taxonomic_group) %>%
   summarise(n_ppr = n_distinct(paperID)) %>%
   arrange(n_ppr) %>% kable()
