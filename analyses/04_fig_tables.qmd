@@ -1325,6 +1325,38 @@ paper_db %>%
          p_present = proj_present) %>% kable()
 ```
 
+**FUll vs partial range in SDM papers**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Total number of SDM papers that used full vs partial range species data to build SDM"
+
+paper_db %>% 
+  filter (sdm_na == "1") %>%
+  summarise(n_ppr = n_distinct(paperID),
+            .by = spatial_limits) %>%
+  mutate(spatial_limits = factor(spatial_limits,
+                                 levels = c("1","2","3","4","0"),
+                                 labels = c("Full range", "Partial range", "Partial range", "Partial range", "Unclear"))) %>%
+  kable()
+
+```
+
+**FUll vs partial range in SDM-CC papers**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Total number of SDM-CC papers that used full vs partial range species data to build SDM"
+
+paper_db %>% 
+  filter (cc_sdm_na == "1") %>%
+  summarise(n_ppr = n_distinct(paperID),
+            .by = spatial_limits) %>%
+  mutate(spatial_limits = factor(spatial_limits,
+                                 levels = c("1","2","3","4","0"),
+                                 labels = c("Full range", "Partial range", "Partial range", "Partial range", "Unclear"))) %>%
+  kable()
+
+```
+
 **Full vs partial range in Canada-inclusive SDM papers**
 
 ```{r, echo = FALSE}
@@ -1500,8 +1532,8 @@ na_db %>%
 #| tbl-cap: "Number of SDM papers that included at least one species from each taxonomic group"
 
 paper_db %>%
-  group_by(taxonomic_group) %>%
   filter (sdm_na == "1") %>%
+  group_by(taxonomic_group) %>%
   summarise (n_ppr = n_distinct(paperID)) %>% 
   arrange(n_ppr) %>%
   kable()
