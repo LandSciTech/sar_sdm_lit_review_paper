@@ -1494,6 +1494,20 @@ na_db %>%
   kable()
 ```
 
+**Research effort by taxa**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of SDM papers that included at least one species from each taxonomic group"
+
+paper_db %>%
+  group_by(taxonomic_group) %>%
+  filter (sdm_na == "1") %>%
+  summarise (n_ppr = n_distinct(paperID)) %>% 
+  arrange(n_ppr) %>%
+  kable()
+
+```
+
 **Figure 4**
 
 ```{r, echo = FALSE}
