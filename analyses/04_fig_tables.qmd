@@ -1341,6 +1341,21 @@ paper_db %>%
 
 ```
 
+```{r, echo = FALSE}
+#| tbl-cap: "Number of species included in a full range SDM at least once"
+paper_db %>% filter (sdm_na == "1") %>%
+  mutate(spatial_limitsF = factor(spatial_limits,
+                                 levels = c("1","2","3","4","0"), #create levels
+                                 labels = c("full at least once", "partial only", "partial only", "partial only", "unclear only"), # create new labels for the factor so that 2, 3, 4 are all treated as partial
+                                 ordered = TRUE)) %>%
+  group_by(species) %>%
+  mutate(min_spatial_limit = min(spatial_limitsF)) %>% #this field will contain whether a species was modelled at full range at least once
+  ungroup() %>%
+  select(species, taxonomic_group, min_spatial_limit) %>%
+  group_by(min_spatial_limit) %>%
+  summarise(n_sp = n_distinct(species)) %>% kable()
+```
+
 **FUll vs partial range in SDM-CC papers**
 
 ```{r, echo = FALSE}
@@ -1355,6 +1370,21 @@ paper_db %>%
                                  labels = c("Full range", "Partial range", "Partial range", "Partial range", "Unclear"))) %>%
   kable()
 
+```
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of species included in a full range SDM-CC at least once"
+paper_db %>% filter (cc_sdm_na == "1") %>%
+  mutate(spatial_limitsF = factor(spatial_limits,
+                                 levels = c("1","2","3","4","0"), #create levels
+                                 labels = c("full at least once", "partial only", "partial only", "partial only", "unclear only"), # create new labels for the factor so that 2, 3, 4 are all treated as partial
+                                 ordered = TRUE)) %>%
+  group_by(species) %>%
+  mutate(min_spatial_limit = min(spatial_limitsF)) %>% #this field will contain whether a species was modelled at full range at least once
+  ungroup() %>%
+  select(species, taxonomic_group, min_spatial_limit) %>%
+  group_by(min_spatial_limit) %>%
+  summarise(n_sp = n_distinct(species)) %>% kable()
 ```
 
 **Full vs partial range in Canada-inclusive SDM papers**
