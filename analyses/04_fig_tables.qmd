@@ -69,7 +69,7 @@ No data analysis required
 
 # 3. Results
 
-## 3.1 Literature review
+## Literature review
 
 **Number of papers obtained**
 
@@ -224,21 +224,22 @@ ca_cc_sdm_temp_trends <- paper_db %>% filter (cc_sdm_ca == "1") %>%
 #| fig-height: 5
 #| fig-width: 5
 
-trend_dat <- bind_rows(sdm_temp_trends, cc_sdm_temp_trends, ca_sdm_temp_trends, ca_cc_sdm_temp_trends) %>%
+trend_dat <- bind_rows(sdm_temp_trends, cc_sdm_temp_trends) %>%  
+                       #ca_sdm_temp_trends, ca_cc_sdm_temp_trends) %>%
   mutate(label = factor(sdm_type,
-                        levels = c("sdm_na","sdm_ca","cc_sdm_na", "cc_sdm_ca"),
+                        levels = c("sdm_na","cc_sdm_na"),
                         #labels = c("All SDMs", "All Canada-inclusive SDMs", "CC-SDMs", "Canada-inclusive CC-SDMs"))) %>%
-                        labels = c("SDM", "Canada-inclusive SDM", "SDM-CC", "Canada-inclusive SDM-CC")))
+                        labels = c("SDM", "SDM-CC")))
 fig_pnl_cum_temp_trends_sdm_lit <- trend_dat %>% 
   ggplot(aes(x=year_published, y=cumulative_paper_count)) +    
   geom_line(aes(colour=factor(label))) +    
   geom_point(aes(colour = factor(label)))+
   theme_classic() +
   scale_color_manual(values = c('#562988', #North American SDMs
-                                '#bda0cc', # Canada SDMs
-                                '#33A02B', # North American CC-SDMs
-                                '#B2DF8A')) + # Canada CC-SDMs
-  ylab("Cumulative number of papers")+   
+                                # '#bda0cc', # Canada SDMs
+                                '#33A02B')) +  # North American CC-SDMs
+                                # '#B2DF8A')) + # Canada CC-SDMs
+  ylab("Cumulative number\nof papers")+   
   xlab("Publication year")+   
   ylim(0,200) +
   labs(color=NULL) +
@@ -246,9 +247,9 @@ fig_pnl_cum_temp_trends_sdm_lit <- trend_dat %>%
                                   to = max(trend_dat$year_published), by = 1), 
                      breaks = seq(from = min(trend_dat$year_published),
                                   to = max(trend_dat$year_published), by = 5), 
-                     guide = guide_axis(minor.ticks = TRUE))+
+                     guide = guide_axis(minor.ticks = TRUE))
   #scale_y_continuous(expand = c(0,0)) +
-  theme(legend.position = c(0.3, 0.85))
+  # theme(legend.position = c(0.3, 0.85))
 
 
 fig_pnl_abs_temp_trends_sdm_lit <- trend_dat %>%
@@ -257,9 +258,9 @@ fig_pnl_abs_temp_trends_sdm_lit <- trend_dat %>%
   geom_point(aes(colour = factor(label)))+
   theme_classic() +
   scale_color_manual(values = c('#562988', #North American SDMs
-                                 '#bda0cc', # Canada SDMs
-                                 '#33A02B', # North American CC-SDMs
-                                 '#B2DF8A')) + # Canada CC-SDMs
+                                # '#bda0cc', # Canada SDMs
+                                 '#33A02B'))+ # North American CC-SDMs
+                                 #'#B2DF8A')) + # Canada CC-SDMs
   ylab("Number of papers")+   
   xlab("Publication year")+   
   ylim(0,25) +
@@ -271,20 +272,959 @@ fig_pnl_cum_temp_trends_sdm_lit
 ```
 
 ```{r}
-#find this figure at this location
-jpeg(paste0(path,"/figures/fig_temp_trends_sdm_lit.jpeg"), units="in", width=5, height=5, res=1000)
-fig_pnl_cum_temp_trends_sdm_lit
-dev.off()
+# #find this figure at this location
+# jpeg(paste0(path,"/figures/fig_temp_trends_sdm_lit.jpeg"), units="in", width=5, height=5, res=1000)
+# fig_pnl_cum_temp_trends_sdm_lit
+# dev.off()
+```
+
+## Trends in available SDM literature
+
+**Summary of number of papers obtained and species included**
+
+```{r, echo = FALSE}
+#get dataframes from paper database summarising number of papers and species modelled
+
+#dataframe including rows that include North American SDM
+sdm_na <- paper_db %>% filter (sdm_na == "1")
+
+#dataframe including rows that include North American SDM-CC
+cc_sdm_na <- paper_db %>% filter (cc_sdm_na == "1")
+
+# #dataframe including rows that include Canada-inclusive SDM
+# sdm_ca <- paper_db %>% filter (sdm_ca =="1")
+# 
+# #dataframe including rows that include Canada-inclusive SDM-CC
+# cc_sdm_ca <- paper_db %>% filter (cc_sdm_ca =="1") 
+```
+
+-   We obtained `r length(unique(sdm_na$paperID))` **North American SDM papers**, which included `r length(unique(sdm_na$species))` unique species.
+-   We obtained `r length(unique(cc_sdm_na$paperID))` **North American SDM-CC papers**, which included `r length(unique(cc_sdm_na$species))` unique species.
+<!-- -   We obtained `r length(unique(sdm_ca$paperID))` **Canada-inclusive SDM papers**, which included `r length(unique(sdm_ca$species))` unique species. -->
+<!-- -   We obtained `r length(unique(cc_sdm_ca$paperID))` **Canada-inclusive SDM-CC papers**, which included `r length(unique(cc_sdm_ca$species))` unique species. -->
+
+```{r, echo = FALSE}
+#clean environment
+rm(sdm_na, sdm_ca)
+```
+
+**SDM-CC paper objectives**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of SDM-CC papers with each category of objective. SDM-CC papers could have as many objectives as required to reflect the paper."
+
+# get number of SDM-CC papers with CC vulnerability objective
+cc_vul_obj <- paper_db %>% 
+  filter (cc_sdm_na == "1") %>%
+  group_by(obj_cc_vulnerability) %>%
+  summarise (n_ppr = n_distinct(paperID)) %>% 
+  ungroup() %>% 
+  filter(obj_cc_vulnerability == "1") %>%
+  mutate(objective = factor(obj_cc_vulnerability,
+                            labels = c("CC Vulnerability"))) %>%
+  select(objective, n_ppr) 
+
+# get number of SDM-CC papers with conservation objective
+cons_obj <- paper_db %>% 
+  filter (cc_sdm_na == "1") %>%
+  group_by(obj_conservation) %>%
+  summarise (n_ppr = n_distinct(paperID)) %>% 
+  ungroup() %>% 
+  filter(obj_conservation == "1") %>%
+  mutate(objective = factor(obj_conservation,
+                            labels = c("Conservation"))) %>%
+  select(objective, n_ppr) 
+
+# get number of SDM-CC papers with methodology objective
+meth_obj <- paper_db %>% 
+  filter (cc_sdm_na == "1") %>%
+  group_by(obj_method) %>%
+  summarise (n_ppr = n_distinct(paperID)) %>% 
+  ungroup() %>% 
+  filter(obj_method == "1") %>%
+  mutate(objective = factor(obj_method,
+                            labels = c("Methodology"))) %>%
+  select(objective, n_ppr) 
+
+# get number of SDM-CC papers with other objective
+oth_obj <- paper_db %>% 
+  filter (cc_sdm_na == "1") %>%
+  group_by(obj_other) %>%
+  summarise (n_ppr = n_distinct(paperID)) %>% 
+  ungroup() %>% 
+  filter(obj_other == "1") %>%
+  mutate(objective = factor(obj_other,
+                            labels = c("Other"))) %>%
+  select(objective, n_ppr) 
+
+bind_rows(cc_vul_obj, cons_obj, meth_obj, oth_obj) %>%
+  kable()
+
+```
+
+**Applications of SDM-No CC papers obtained**
+
+```{r, echo = FALSE}
+sdm_n_cc <- paper_db %>% filter (sdm_no_cc_na == "1")
+```
+
+-   The number of SDMs without CC: `r n_distinct(sdm_n_cc$paperID)`
+-   The number of species included in SDMs w out CC: `r n_distinct(sdm_n_cc$species)`
+
+```{r, echo = FALSE}
+paper_db %>%
+  filter (sdm_na == "1", cc_sdm_na != "1") %>%
+  group_by(built_sdm_historical, built_sdm_present, proj_future, proj_present, backcast) %>%
+  summarise(n_ppr = n_distinct(paperID)) %>%
+  rename(b_historial = built_sdm_historical,
+         b_present = built_sdm_present,
+         p_future = proj_future,
+         p_back = backcast,
+         p_present = proj_present) %>% kable()
+```
+
+**Full vs partial range in Canada-inclusive SDM papers**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Total number of Canada-inclusive SDM papers that used full vs partial range species data to build SDM"
+# 
+# paper_db %>% 
+#   filter (sdm_ca == "1") %>%
+#   summarise(n_ppr = n_distinct(paperID),
+#             .by = spatial_limits) %>%
+#   mutate(spatial_limits = factor(spatial_limits,
+#                                  levels = c("1","2","3","4","0"),
+#                                  labels = c("Full range", "Partial range", "Partial range", "Partial range", "Unclear"))) %>%
+#   kable()
 ```
 
 ```{r, echo = FALSE}
-#clean env
-rm(fig_pnl_cum_temp_trends_sdm_lit, #figure panel
-   sdm_temp_trends, cc_sdm_temp_trends, ca_sdm_temp_trends, ca_cc_sdm_temp_trends, year_range, year_df, #dataframes
-   trends_acrs_time_lit_review) #function
+#| tbl-cap: "Number of species included in a full range Canada-inclusive SDM at least once"
+# paper_db %>% filter (sdm_ca == "1") %>%
+#   mutate(spatial_limitsF = factor(spatial_limits,
+#                                  levels = c("1","2","3","4","0"), #create levels
+#                                  labels = c("full at least once", "partial only", "partial only", "partial only", "unclear only"), # create new labels for the factor so that 2, 3, 4 are all treated as partial
+#                                  ordered = TRUE)) %>%
+#   group_by(species) %>%
+#   mutate(min_spatial_limit = min(spatial_limitsF)) %>% #this field will contain whether a species was modelled at full range at least once
+#   ungroup() %>%
+#   select(species, taxonomic_group, min_spatial_limit) %>%
+#   group_by(min_spatial_limit) %>%
+#   summarise(n_sp = n_distinct(species)) %>% kable()
 ```
 
-## 3.2 Use and applications of SDMs in listing documents
+**Full vs partial range in Canada-inclusive SDM-CC papers**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Total number of Canada-inclusive SDM-CC papers that use full vs partial range species data to build SDM"
+# paper_db %>% 
+#   filter (cc_sdm_ca == "1") %>%
+#   summarise(n_ppr = n_distinct(paperID),
+#             .by = spatial_limits) %>%
+#   mutate(spatial_limits = factor(spatial_limits,
+#                                  levels = c("1","2","3","4","0"),
+#                                  labels = c("Full range", "Partial range", "Partial range", "Partial range", "Unclear"))) %>%
+#   kable()
+```
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of species included in a full range Canada-inclusive SDM-CC at least once"
+# paper_db %>% filter (cc_sdm_ca == "1") %>%
+#   mutate(spatial_limitsF = factor(spatial_limits,
+#                                  levels = c("1","2","3","4","0"), #create levels
+#                                  labels = c("full at least once", "partial only", "partial only", "partial only", "unclear only"), # create new labels for the factor so that 2, 3, 4 are all treated as partial
+#                                  ordered = TRUE)) %>%
+#   group_by(species) %>%
+#   mutate(min_spatial_limit = min(spatial_limitsF)) %>% #this field will contain whether a species was modelled at full range at least once
+#   ungroup() %>%
+#   select(species, taxonomic_group, min_spatial_limit) %>%
+#   group_by(min_spatial_limit) %>%
+#   summarise(n_sp = n_distinct(species)) %>%
+#   kable()
+```
+
+**Number of species per paper**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of papers vs number of species (Canadian SAR + others) focused on in a single SDM paper. num_species = 1 means that the paper was species specific"
+paper_db %>% filter (sdm_na == "1") %>%
+  summarise(n_ppr = n_distinct(paperID),
+            .by = num_species) %>%
+  mutate(num_species = as.numeric(num_species)) %>%
+  arrange(num_species) %>% 
+  kable()
+```
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of papers vs number of species (Canadian SAR + others) focused on in a single SDM-CC paper. num_species = 1 means that the paper was species specific"
+paper_db %>% filter (cc_sdm_na == "1") %>%
+  summarise(n_ppr = n_distinct(paperID),
+            .by = num_species) %>%
+  mutate(num_species = as.numeric(num_species),
+         n_ppr = as.numeric(n_ppr)) %>%
+  arrange(num_species) %>% kable()
+```
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of papers vs number of Canadian SAR (i.e., CAN-SAR species) included in a single SDM paper"
+
+n_sar_sdm <- paper_db %>% filter (sdm_na == "1") %>%
+  group_by(paperID) %>%
+  mutate(n_sar = n_distinct(species)) %>%
+  ungroup() %>%
+  summarise(n_ppr = n_distinct(paperID),
+            .by = n_sar) %>%
+  arrange(n_sar)
+
+n_sar_sdm %>% kable()
+```
+
+The maximum number of SAR included in a single SDM paper: `r max(n_sar_sdm$n_sar)`
+
+```{r, echo = FALSE}
+max_n_sar_ppr <- paper_db %>% filter (sdm_na == "1") %>%
+  group_by(paperID) %>%
+  mutate(n_sar = n_distinct(species)) %>%
+  ungroup() %>%
+  filter (n_sar == max(n_sar_sdm$n_sar))
+```
+
+The paper: `r unique(max_n_sar_ppr$doc_citation)`
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of papers vs number of Canadian SAR (i.e., CAN-SAR species) included in a single SDM-CC paper"
+n_sar_cc_sdm <- paper_db %>% filter (cc_sdm_na == "1") %>%
+  group_by(paperID) %>%
+  mutate(n_sar = n_distinct(species)) %>%
+  ungroup() %>%
+  summarise(n_ppr = n_distinct(paperID),
+            .by = n_sar) %>%
+  arrange(n_sar)
+
+n_sar_cc_sdm %>% kable()
+```
+
+The maximum number of SAR included in a single SDM-CC paper: `r max(n_sar_cc_sdm$n_sar)`
+
+```{r, echo = FALSE}
+max_n_sar_ppr <- paper_db %>% filter (cc_sdm_na == "1") %>%
+  group_by(paperID) %>%
+  mutate(n_sar = n_distinct(species)) %>%
+  ungroup() %>%
+  filter (n_sar == max(n_sar_cc_sdm$n_sar))
+```
+
+The paper: `r unique(max_n_sar_ppr$doc_citation)`
+
+```{r, echo = FALSE}
+#clean environment
+rm(max_n_sar_ppr, 
+   n_sar_sdm,
+   n_sar_cc_sdm)
+```
+
+**Proportion of species included in at least one paper by taxa**
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number (n) and proportion (prop_taxa) of species in each taxonomic group with SDMs. Proportions are based on total number of species in each group."
+
+# total number of species per taxa
+sp_taxa <- sarsdm %>%
+  group_by(taxonomic_group) %>%
+  summarise (n_taxa = n_distinct(species))
+
+na_db <- sarsdm %>%
+  group_by(taxonomic_group, cc_sdm, sdm) %>%
+  summarise(n = n_distinct(species)) %>%
+  ungroup() %>%
+  mutate(label = paste0(cc_sdm, sdm),
+         label = factor(label,
+                        levels = c("00", "11","01"),
+                        labels = c("No SDM","SDM-CC", "SDM-No CC only")),
+         scope = c("North America"))
+
+na_db <- merge(na_db, sp_taxa, by = "taxonomic_group") %>%
+  mutate(prop_taxa = n/n_taxa)
+
+na_db %>%
+  mutate(prop_taxa = round(prop_taxa, digits = 2)) %>%
+  select(taxonomic_group, label, n, prop_taxa) %>%
+  kable()
+```
+
+**Figure 4**
+
+```{r, echo = FALSE}
+#get data showing number of papers that fit each category (SDM, SDM-CC, and Canada-inclusive)
+
+tot_ppr_taxa <- paper_db %>%
+  filter(sdm_na == "1") %>%
+  group_by(taxonomic_group) %>%
+  summarise(n_ppr_taxa = n_distinct(paperID))
+
+fig_ppr_db <- paper_db %>%
+  group_by(taxonomic_group, sdm_na, sdm_ca, cc_sdm_na, cc_sdm_ca) %>%
+  summarise(n_ppr = n_distinct(paperID)) %>%
+  mutate(label = paste0(sdm_na, sdm_ca, cc_sdm_na, cc_sdm_ca),
+         label = factor(label,
+                        levels = c("0000",
+                                   "1111",
+                                   "1010",
+                                   "1100",
+                                   "1000"),
+                        #labels = c("remove", "CC-SDM inc. Canada", "CC-SDM exc. Canada", "SDM w/out CC inc. Canada", "SDM w/out CC exc. Canada"))
+                        labels = c("remove", "CC-SDM", "CC-SDM", "SDM", "SDM"))
+         ) %>%
+  filter (label != "remove") 
+
+fig_ppr_db <- merge(fig_ppr_db, tot_ppr_taxa, by = "taxonomic_group")
+fig_ppr_db <- fig_ppr_db %>%
+  mutate(prop_ppr = n_ppr / n_ppr_taxa)
+```
+
+```{r, echo = FALSE}
+
+# Panel A = number of papers per taxa, broken down by SDM and CC-SDM
+fig_pnl_num_ppr <- fig_ppr_db %>%
+  mutate(taxonomic_group = factor(taxonomic_group,
+                                  levels = c("Amphibians", "Arthropods","Birds","Lichens","Mammals (terrestrial)","Molluscs","Mosses","Reptiles","Vascular Plants"),
+                                  labels = c("Amphibians", "Arthropods","* Birds","Lichens","Mammals","Molluscs","Mosses","Reptiles","Vascular Plants")),
+         label = factor(label, levels = c("CC-SDM", "SDM"), 
+                        labels = c("SDM-CC", "SDM-No CC")),
+         label = str_wrap(label, width = 15)
+) %>%
+  ggplot(aes(x = fct_rev(taxonomic_group), y = n_ppr, fill = fct_rev(label))) +
+  geom_bar(position = "stack", stat = "identity") +
+  scale_fill_manual(values = c(#'#B2DF8A', 
+                               '#1F78B4',
+                               #'#A5CEE2', 
+                               '#33A02B'
+                                )) + 
+  #scale_fill_brewer(palette = "Paired") +
+  guides(fill = guide_legend(reverse=T)) +
+  theme_classic() +
+  coord_flip() +
+  xlab(element_blank()) +
+  ylab("Number of papers") +
+  #scale_y_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
+  theme(legend.title = element_blank(),
+        legend.key.spacing.y = unit(.2, "cm"),
+        axis.text.y = element_text(size = 10.5),
+        axis.text.x = element_text(size = 10.5),
+        legend.text = element_text(size = 10))
+
+# create database to use when labelling # of species on bar graphs
+sp_taxa_label <- sp_taxa %>%
+  mutate(taxonomic_group = factor(taxonomic_group,
+                                  levels = c("Amphibians","Arthropods","Birds","Lichens","Mammals (terrestrial)","Molluscs","Mosses","Reptiles","Vascular Plants"),
+                                  labels =c("Amphibians", "Arthropods", "* Birds", "Lichens", "Mammals", "Molluscs", "Mosses", "Reptiles", "Vascular Plants")))
+
+
+# Panel B = prop species per taxa included in SDM papers
+
+na_db_alt <- sarsdm %>%
+  group_by(taxonomic_group, cc_sdm, sdm_no_cc) %>%
+  summarise(n = n_distinct(species))
+
+na_db_alt <- merge(na_db_alt, sp_taxa, by = "taxonomic_group")
+
+na_db_alt <- na_db_alt %>% 
+  mutate(prop_taxa = n/n_taxa,
+         label = paste0(cc_sdm, sdm_no_cc),
+         label = factor(label,
+                        levels = c("00", "01", "10", "11"),
+                        labels = c("No SDM","SDM-No CC", "SDM-CC", "SDM-CC")),
+         scope = c("North America"))
+
+fig_pnl_prop_sp_model <- na_db_alt %>%
+  mutate(taxonomic_group = factor(taxonomic_group,
+                                  labels = c("Amphibians","Arthropods","* Birds","Lichens","Mammals","Molluscs","Mosses","Reptiles","Vascular Plants"))) %>%
+  ggplot(aes(x = forcats::fct_rev(taxonomic_group), y = prop_taxa, fill = label)) +
+  geom_bar(position = "stack", stat = "identity") +
+  geom_text(aes(taxonomic_group, 1.05, label = n_taxa, fill = NULL), size = 3, colour = '#36454F', data = sp_taxa_label) +
+  theme_classic() +
+  ylab("Proportion of species") +
+  xlab(element_blank()) +
+  theme(legend.title = element_blank(),
+        axis.text.y = element_text(size = 10.5),
+        axis.text.x = element_text(size = 10.5),
+        legend.text = element_text(size = 9)) +
+  scale_fill_manual(values = c('grey', # no SDM
+                               '#1c63a5', # SDM-No CC
+                               '#2c9320', #SDM-CC
+                               '#562888' # SDM-CC &\nSDM-No CC                              
+                               ) ) + 
+  guides(fill = guide_legend(reverse=T)) +
+  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
+  coord_flip()
+```
+
+```{r, echo = FALSE}
+#| fig-cap: "A) Number of SDM papers obtained during the literature review that include each taxonomic group, broken down by SDMs that include climate change projections (SDM-CC, blue) and all other SDMs (SDM-No CC, green), as well as whether the papers were Canada-exclusive (dark colours) or Canada-inclusive (light colours). Canada-inclusivity and exclusivity represents whether data from at least a portion of the species’ Canadian range was included when building the SDM. Papers could model species from multiple taxonomic groups, thus the sum of the number of papers across groups will be greater than the total number of SDM papers (n = 176). B) Proportion of species in each taxonomic group we found through the literature review to not be included in any peer-reviewed SDMs (no SDM, grey), or that were included in at least one SDM-No CC (blue), SDM-CC (green), or both types of models (SDM-CC & SDM-No CC, purple). Proportion of species in any SDM = sum of proportion of species across the three SDM groups. Proportions are based on the total number of species in each group (number at right end of bars). The proportion of species by taxonomic group included in Canada-inclusive SDMs is almost indistinguishable and thus not shown here (see Figure S3). * Note that a partial literature review was completed for Birds (see Section 2.2)"
+#| fig-width: 4
+#| fig-height: 6
+
+leg_plt <- ggplot(data.frame(x = as.factor(1:4), y = 1:4), aes(x,y, fill = x))+
+geom_col()+
+scale_fill_manual(name = NULL, values = rev(c('grey', # no SDM
+                               '#1c63a5', # SDM-No CC
+                               '#2c9320', #SDM-CC
+                               '#562888' # SDM-CC &\nSDM-No CC                        
+                               )),
+                  labels = rev(c("No SDM", "SDM-No CC", "SDM-CC", "All SDMs")))+
+theme(legend.position = "top")
+
+leg <- cowplot::get_plot_component(leg_plt, "guide-box",
+                                   return_all = TRUE)
+
+fig_lit_review <- plot_grid(
+          leg[[4]],
+          fig_pnl_cum_temp_trends_sdm_lit + guides(col = "none"),
+          fig_pnl_num_ppr + guides(fill = "none"),
+          fig_pnl_prop_sp_model + guides(fill = "none"),
+          labels = c("", LETTERS[1:4]),
+          align = "v",
+          axis = "l", 
+          nrow = 4,
+          rel_heights = c(0.04, 0.32, 0.32, 0.32))
+fig_lit_review
+```
+
+```{r}
+#save figure
+jpeg(paste0(path,"/figures/fig_lit_review_results.jpeg"), units="in", width=4, height=7, res=1000)
+fig_lit_review
+dev.off()
+```
+
+**Research effort stats**
+
+All of the stats in this section exclude Birds, since we did not complete a full literature review for that taxa.
+
+```{r, echo = FALSE}
+
+re_db <- sarsdm %>% filter (taxonomic_group != "Birds") 
+```
+
+-   The mean number of SDM papers found per species in the literature review (including 0's): `r mean(re_db$n_sdm)`
+-   The mean number of SDM-CC papers found per species in the literature review: `r mean(re_db$n_cc_sdm)`
+
+```{r, echo = FALSE}
+#| tbl-cap: "Species and number of SDM and SDM-CC papers they were found to be included in. This table includes Bird species for reference, but likely isn't an accurate reflection of the number of papers these species are included in since we didn't complete a full literature review for this taxa. This table does not include species that were not included in any SDMs (n_sdm = 0)."
+dat_n_sdm <- sarsdm %>%
+  select(species, taxonomic_group, sara_status_adj, n_sdm, n_sdm_ca, n_cc_sdm, n_cc_sdm_ca, range_size_America) %>% 
+  #arrange(-(n_sdm)) %>%
+  arrange(-(n_sdm))%>%
+  unique() %>% 
+  mutate(range_size_America = replace_na(range_size_America, 0)) 
+  
+lab_n_sdm <- dat_n_sdm %>% filter(n_sdm >= 9)
+
+jttr <- position_jitter(width = 0.2, height = 0, seed = 1234)
+  
+plt_n_sdm <- dat_n_sdm %>% 
+  ggplot(aes(n_sdm, range_size_America, col = taxonomic_group))+
+  geom_point(position = jttr)+
+  scale_x_continuous(breaks = 0:16, expand = expansion(add = c(0.5,5)))+
+  scale_y_sqrt(breaks = c(0, 10^(5:7), 2*10^7), 
+               expand = expansion(mult = c(0.025, 0.05)))+
+  scale_color_brewer(palette = "Paired")+
+  # ggrepel::geom_text_repel(
+  geom_text(
+  data = lab_n_sdm, 
+  aes(label = species, x = n_sdm+0.25), 
+  position = jttr,
+  show.legend = FALSE,
+  # min.segment.length = 0,
+  # direction = "y",
+  # box.padding = 0,
+  hjust = 0
+  )+
+  theme_classic()+
+  labs(x = "Number of papers", y = "Range size (square root transformed)", col = "Taxonmonic group")
+  
+plt_n_sdm 
+  
+
+```
+
+**Research effort: contrasting Canada-inclusive and Canada-exclusive papers**
+
+```{r, echo = FALSE}
+
+# create research effort database - excludes Birds 
+# add field to database showing the difference between the number of SDM papers when comparing North American SDMs and Canada-inclusive SDMs
+re_db <- re_db %>%
+  mutate(diff_n_sdm = n_sdm - n_sdm_ca,
+         diff_n_cc_sdm = n_cc_sdm - n_cc_sdm_ca) %>%
+  select (taxonomic_group, species, n_sdm, n_cc_sdm, n_sdm_ca, n_cc_sdm_ca, diff_n_sdm, diff_n_cc_sdm) %>%
+  unique()
+```
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of species vs difference in the number of North American and Canada-inclusive SDM papers. The summary in this table only includes species that were included in at least one North American SDM. diff_n_sdm = 0 means that all of the papers the species was included in were Canada-inclusive."
+
+re_db %>% 
+  filter (n_sdm != "0") %>% #filter to only include species that are modelled in SDM at least once so that 0's represent no change in the number of SDMs, rather than species that were included in 0 papers to begin with
+  summarise(n_sp = n_distinct(species),
+            .by = diff_n_sdm) %>% 
+  arrange(diff_n_sdm) %>% kable()
+```
+
+```{r, echo = FALSE}
+#| tbl-cap: "Number of species vs difference in the number of North American and Canada-inclusive SDM-CC papers. The summary in this table only includes species that were included in at least one North American SDM-CC paper. diff_n_cc_sdm = 0 means that all of the SDM-CCpapers the species was included in were Canada-inclusive."
+
+re_db %>% 
+  filter (n_cc_sdm != "0") %>% #filter to only include species that are modelled in SDM-CC at least once so that 0's represent no change in the number of SDM-CC, rather than species that were included in 0 papers to begin with
+  summarise(n_sp = n_distinct(species),
+            .by = diff_n_cc_sdm) %>% 
+  arrange(diff_n_cc_sdm) %>% kable()
+```
+
+```{r, echo = FALSE}
+#| tbl-cap: "List of species that have been included in at least one North American SDM paper, showing the difference (diff_n_sdm) between the number of SDM papers when comparing North Amercian SDM papers to Canada inclusive. diff_n_sdm = number of North American SDM papers - number of Canada-inclusive papers. Therefore, high values of diff_n_sdm indicate that the species was included in a lot of Canada-exclusive papers, while a value of 0 means that the species was only included in Canada-inclusive papers."
+
+re_db %>%
+  filter (n_sdm != "0") %>%
+  select (taxonomic_group, species, diff_n_sdm) %>%
+  unique() %>%
+  arrange(-(diff_n_sdm)) %>%
+  kable()
+```
+
+```{r, echo = FALSE}
+#| tbl-cap: "List of species that have been included in at least one North American SDM-CC paper, showing the difference (diff_n_cc_sdm) between the number of SDM-CC papers when comparing North Amercian SDM-CC papers to Canada inclusive. diff_n_cc_sdm = number of North American SDM-CC papers - number of Canada-inclusive papers. Therefore, high values of diff_n_cc_sdm indicate that the species was included in a lot of Canada-exclusive papers, while a value of 0 means that the species was only included in Canada-inclusive papers."
+
+re_db %>%
+  filter (n_cc_sdm != "0") %>%
+  select (taxonomic_group, species, diff_n_cc_sdm) %>%
+  unique() %>%
+  arrange(-(diff_n_cc_sdm)) %>%
+  kable()
+```
+
+**Figure 5**
+
+```{r, echo = FALSE}
+# get binned research effort data
+
+max_p <- max(re_db$n_sdm) # max number of SDMs, to assign break limit
+
+# North American binned data #==================================================
+## SDM ##=======================================================================
+
+re_na_sdm_bin <- re_db %>%
+  mutate(n_paper_cat = cut(n_sdm,
+                           breaks = c(-1, 0, 1, 5, 10, max_p),
+                           labels = c("0", "1","2-5","6-10", paste0("11-",max_p)))) %>%
+  group_by(taxonomic_group) %>%
+  mutate(n_sp_taxa = n_distinct(species)) %>%
+  ungroup() %>%
+  group_by(taxonomic_group, n_paper_cat) %>%
+  mutate(n_sp_re = n_distinct(species),
+         prop_sp = round(n_sp_re / n_sp_taxa, digits = 3)) %>%
+  ungroup() %>%
+  select(taxonomic_group, n_paper_cat, n_sp_re, prop_sp) %>%
+  unique() %>%
+  arrange(taxonomic_group, n_paper_cat) %>% 
+  mutate(taxonomic_group = factor(taxonomic_group,
+                                  levels = c("Amphibians",
+                                                   "Arthropods",
+                                                   "Birds",
+                                                   "Lichens",
+                                                   "Mammals (terrestrial)",
+                                                   "Molluscs",
+                                                   "Mosses",
+                                                   "Reptiles",
+                                                   "Vascular Plants"),
+                                        labels = c("Amphibians",
+                                                   "Arthropods",
+                                                   "Birds",
+                                                   "Lichens",
+                                                   "Mammals",
+                                                   "Molluscs",
+                                                   "Mosses",
+                                                   "Reptiles",
+                                                   "Vascular Plants")),
+         n_paper_cat = factor(n_paper_cat),
+         label = c("SDM"),
+         scope = c("North American"))
+
+## CC-SDM ##====================================================================
+
+re_na_cc_sdm_bin <- re_db %>%
+  mutate(n_paper_cat = cut(n_cc_sdm,
+                           breaks = c(-1, 0, 1, 5, 10, max_p),
+                           labels = c("0", "1","2-5","6-10", paste0("11-",max_p)))) %>%
+  group_by(taxonomic_group) %>%
+  mutate(n_sp_taxa = n_distinct(species)) %>%
+  ungroup() %>%
+  group_by(taxonomic_group, n_paper_cat) %>%
+  mutate(n_sp_re = n_distinct(species),
+         prop_sp = round(n_sp_re / n_sp_taxa, digits = 3)) %>%
+  ungroup() %>%
+  select(taxonomic_group, n_paper_cat, n_sp_re, prop_sp) %>%
+  unique() %>%
+  arrange(taxonomic_group, n_paper_cat) %>% 
+  mutate(taxonomic_group = factor(taxonomic_group,
+                                  levels = c("Amphibians",
+                                                   "Arthropods",
+                                                   "Birds",
+                                                   "Lichens",
+                                                   "Mammals (terrestrial)",
+                                                   "Molluscs",
+                                                   "Mosses",
+                                                   "Reptiles",
+                                                   "Vascular Plants"),
+                                        labels = c("Amphibians",
+                                                   "Arthropods",
+                                                   "Birds",
+                                                   "Lichens",
+                                                   "Mammals",
+                                                   "Molluscs",
+                                                   "Mosses",
+                                                   "Reptiles",
+                                                   "Vascular Plants")),
+         label = c("CC-SDM"),
+         scope = c("North American"))
+
+re_na_cc_sdm_bin <- rows_append(re_na_cc_sdm_bin, tibble(taxonomic_group = "Amphibians", n_paper_cat = paste0("11-",max_p), n_sp_re = 0, prop_sp = 0, label = "CC-SDM", scope = "North America")) %>%
+  mutate(n_paper_cat = factor(n_paper_cat))
+
+```
+
+```{r, echo = FALSE}
+#| fig-cap: "Proportion of species in each taxonomic group with each level of research effort (i.e., binned number of papers a species was included in). A) SDM research effort B) SDM-CC research effort (SDM-CC are a subset of the SDMs that include climate change projections). Proportions are based on the total number of species in each taxa (numbers at right end of bars). Birds are not included in this analysis (see Section 2.2). Research effort for the subset of SDM and SDM-CC papers that are Canada-inclusive can be found in the Supplementary (Figure S4)"
+#| fig-width: 6
+#| fig-height: 4
+
+sp_taxa_label_re <- sp_taxa_label %>% filter (taxonomic_group != "* Birds") #exclude Birds from analysis
+
+# SDM research effort panel
+fig_pnl_sdm_re <- re_na_sdm_bin %>%
+  mutate(n_paper_cat_rev = factor(n_paper_cat,
+                                  levels = c("11-16",
+                                             "6-10",
+                                             "2-5",
+                                             "1",
+                                             "0"))) %>%
+  ggplot(aes(x = forcats::fct_rev(taxonomic_group), y = prop_sp, fill = n_paper_cat_rev)) +
+  ggtitle("SDMs")+
+  geom_bar(position = "stack", stat = "identity") +
+  geom_text(aes(taxonomic_group, 1.05, label = n_taxa, fill = NULL), size = 3, colour = '#36454F', data = sp_taxa_label_re) +
+  theme_classic() +
+  #scale_fill_manual(values = c('#0c5c21','#379e4b','#93d289','#dff4da','grey'))+
+  #scale_fill_manual(values=c('#0C3D8A','#367db7','#8dbddb','#d5e6f6','grey')) +
+  scale_fill_manual(values=c('#2f006a', '#553b92','#8d85be','#d0d1e5','grey')) +
+  ylab("Proportion of species") +
+  xlab(element_blank()) +
+  labs(fill = "Number of papers") +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 10),
+        legend.key.size = unit(.5, "cm")) +
+  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
+  guides(fill = guide_legend(reverse=T)) +
+  coord_flip()
+
+# SDM-CC research effort panel
+fig_pnl_cc_sdm_re <- re_na_cc_sdm_bin %>%
+  mutate(n_paper_cat_rev = factor(n_paper_cat,
+                                  levels = c("11-16",
+                                             "6-10",
+                                             "2-5",
+                                             "1",
+                                             "0"))) %>%
+  filter(prop_sp != 0) %>%
+  ggplot(aes(x = forcats::fct_rev(taxonomic_group), y = prop_sp, fill = n_paper_cat_rev)) +
+  ggtitle("SDM-CC (subset of SDMs)")+
+  geom_bar(position = "stack", stat = "identity") +
+  geom_text(aes(taxonomic_group, 1.05, label = n_taxa, fill = NULL), size = 3, colour = '#36454F', data = sp_taxa_label_re) +
+  theme_classic() +
+  scale_fill_manual(values = c('#0c5c21','#379e4b','#dff4da','grey')) +
+  #scale_fill_manual(values=c('#367db7','#8dbddb','#d5e6f6','grey'))+
+  ylab("Proportion of species") +
+  xlab(element_blank()) +
+  labs(fill = "Number of papers") +
+  theme(axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 10),
+        legend.key.size = unit(.5, "cm")) +
+  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
+  guides(fill = guide_legend(reverse=T)) +
+  coord_flip()
+
+plot_grid(fig_pnl_sdm_re, fig_pnl_cc_sdm_re,
+          nrow = 2,
+          labels = "AUTO")
+```
+
+```{r}
+#save figure
+jpeg(paste0(path,"/figures/fig_research_effort.jpeg"), units="in", width=6, height=4, res=1000)
+plot_grid(fig_pnl_sdm_re, fig_pnl_cc_sdm_re,
+          nrow = 2,
+          labels = "AUTO")
+dev.off()
+```
+
+## Inclusion and research effort regression models
+
+**Figure 6**
+
+```{r, echo = FALSE}
+#| fig-cap: "A) Standardized effect sizes (coefficients and 95% confidence intervals[CI]) from A) the SDM inclusion model, B) the SDM-CC inclusion model, C) SDM research effort model, D) SDM-CC research model. SDM and SDM-CC inclusion GLMs predict probability of inclusion in a SDM or SDM-CC paper based on whether a paper that includes the species was obtained in the literature review, and were built with a Binomial distribution and logit link. SDM and SDM-CC research effort GLMs predict the number of SDM or SDM-CC papers that include each species, based on the results of the literature review, and were built with a Quasipoisson distribution with a log link. The four models share most of the same covariates: taxonomic group (8 levels; Amphibians excluded from SDM inclusion model, Birds excluded from both research effort models), SARA status (3 levels), range size (square root transformed for SDM inclusion model and both research effort models, log transformed in SDM-CC inclusion model), and year of listing under SARA. SDM-CC inclusion and research effort models include an additional covariate - whether climate change was listed as a threat in the species’ Canadian policy documents (CC threat; Y/N). Symbols in all panels reflect modelled covariate groupings. In all models, the reference level for taxonomic group is ‘Arthropods’, for SARA status it is ‘Special Concern’ and in the SDM-CC inclusion and research effort models, the reference level for CC threat is ‘No’.  For more details see Tables S4-S7."
+#| fig-width: 10
+#| fig-height: 8
+
+# M1: probability of inclusion in SDM #=========================================
+
+m1_plt_data <- sjPlot::plot_model(m1_std_clean, sort.est = FALSE, title = "SDM inclusion model",
+                               transform = NULL)$data  %>% 
+  mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
+                           str_detect(term, "Birds") ~ 1,
+                           str_detect(term, "Lichens") ~ 1,
+                           str_detect(term, "Mammals") ~ 1,
+                           str_detect(term, "Molluscs") ~ 1,
+                           str_detect(term, "Mosses") ~ 1,
+                           str_detect(term, "Reptiles") ~ 1,
+                           str_detect(term, "VascularPlants") ~ 1,
+                           str_detect(term, "Threatened") ~ 2,
+                           str_detect(term, "Endangered") ~ 2,
+                           str_detect(term, "Rangesize") ~ 3,
+                           str_detect(term, "Year") ~ 4,
+                           str_detect(term, "CCThreat") ~ 5), 
+         ord = case_when(str_detect(term, "Amphibians") ~ 1,
+                           str_detect(term, "Birds") ~ 2,
+                           str_detect(term, "Lichens") ~ 3,
+                           str_detect(term, "Mammals") ~ 4,
+                           str_detect(term, "Molluscs") ~ 5,
+                           str_detect(term, "Mosses") ~ 6,
+                           str_detect(term, "Reptiles") ~ 7,
+                           str_detect(term, "VascularPlants") ~ 8,
+                           str_detect(term, "Threatened") ~ 9,
+                           str_detect(term, "Endangered") ~ 10,
+                           str_detect(term, "Rangesize") ~ 11,
+                           str_detect(term, "Year") ~ 12,
+                           str_detect(term, "CCThreat") ~ 13),
+         term = str_replace(term, "VascularPlants","Vascular Plants"),
+         term = str_replace(term, "Rangesize", "Range size"),
+         term = str_replace(term, "Year", "Year listed"),
+         term = str_replace(term, "CCThreat", "CC Threat (Y)"),
+         term = fct_reorder(term, ord, .desc = TRUE)
+         ) %>% 
+  arrange(desc(ord), estimate)
+
+m1_plt <- m1_plt_data %>% 
+  ggplot(aes(term, estimate))+
+  theme_classic()+
+  ggtitle("SDM inclusion model")+
+  geom_hline(yintercept = 0, col = "grey", size = 0.2)+
+  geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
+  geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
+  geom_point(shape = m1_plt_data$group, size = 4, stroke = 1.5)+ 
+  scale_color_manual(values = c("black", "black"))+
+  ylim(-1.15, 2)+
+  coord_flip()+
+  #scale_x_discrete(labels = labs1)+
+  labs(y = "Standardized effect (95% CI)", x = NULL) +
+  theme(axis.text.x = element_text(size = 11),
+        axis.text.y = element_text(size = 11),
+        axis.title.x = element_text(size = 11.5))
+
+
+# M2: Probability of inclusion in CC-SDM #======================================
+
+m2_plt_data <- sjPlot::plot_model(m2_std_clean, sort.est = FALSE, title = "CC-SDM inclusion model",
+                               transform = NULL)$data  %>% 
+  mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
+                           str_detect(term, "Birds") ~ 1,
+                           str_detect(term, "Lichens") ~ 1,
+                           str_detect(term, "Mammals") ~ 1,
+                           str_detect(term, "Molluscs") ~ 1,
+                           str_detect(term, "Mosses") ~ 1,
+                           str_detect(term, "Reptiles") ~ 1,
+                           str_detect(term, "VascularPlants") ~ 1,
+                           str_detect(term, "Threatened") ~ 2,
+                           str_detect(term, "Endangered") ~ 2,
+                           str_detect(term, "Rangesize") ~ 3,
+                           str_detect(term, "Year") ~ 4,
+                           str_detect(term, "CCThreat") ~ 5), 
+         ord = case_when(str_detect(term, "Amphibians") ~ 1,
+                           str_detect(term, "Birds") ~ 2,
+                           str_detect(term, "Lichens") ~ 3,
+                           str_detect(term, "Mammals") ~ 4,
+                           str_detect(term, "Molluscs") ~ 5,
+                           str_detect(term, "Mosses") ~ 6,
+                           str_detect(term, "Reptiles") ~ 7,
+                           str_detect(term, "VascularPlants") ~ 8,
+                           str_detect(term, "Threatened") ~ 9,
+                           str_detect(term, "Endangered") ~ 10,
+                           str_detect(term, "Rangesize") ~ 11,
+                           str_detect(term, "Year") ~ 12,
+                           str_detect(term, "CCThreat") ~ 13),
+         term = str_replace(term, "VascularPlants","Vascular Plants"),
+         term = str_replace(term, "Rangesize", "Range size"),
+         term = str_replace(term, "Year", "Year listed"),
+         term = str_replace(term, "CCThreat", "CC Threat (Y)"),
+         term = fct_reorder(term, ord, .desc = TRUE)
+         ) %>% 
+  arrange(desc(ord), estimate)
+
+m2_plt <- m2_plt_data %>% 
+  ggplot(aes(term, estimate))+
+  theme_classic()+
+  ggtitle("SDM-CC inclusion model")+
+  geom_hline(yintercept = 0, col = "grey", size = 0.2)+
+  geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
+  geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
+  geom_point(shape = m2_plt_data$group, size = 4, stroke = 1.5)+ 
+  scale_color_manual(values = c("black", "black"))+
+  ylim(-1.15, 2)+
+  coord_flip()+
+  #scale_x_discrete(labels = labs1)+
+  labs(y = "Standardized effect (95% CI)", x = NULL)+
+  theme(axis.text.x = element_text(size = 11),
+        axis.text.y = element_text(size = 11),
+        axis.title.x = element_text(size = 11.5))
+
+# M7: research effort for SDMs #================================================
+
+m7_plt_data <- sjPlot::plot_model(m7_std_clean, sort.est = FALSE, title = "SDM research effort model",
+                               transform = NULL)$data  %>% 
+  mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
+                           str_detect(term, "Birds") ~ 1,
+                           str_detect(term, "Lichens") ~ 1,
+                           str_detect(term, "Mammals") ~ 1,
+                           str_detect(term, "Molluscs") ~ 1,
+                           str_detect(term, "Mosses") ~ 1,
+                           str_detect(term, "Reptiles") ~ 1,
+                           str_detect(term, "VascularPlants") ~ 1,
+                           str_detect(term, "Threatened") ~ 2,
+                           str_detect(term, "Endangered") ~ 2,
+                           str_detect(term, "Rangesize") ~ 3,
+                           str_detect(term, "Year") ~ 4,
+                           str_detect(term, "CCThreat") ~ 5), 
+         ord = case_when(str_detect(term, "Amphibians") ~ 1,
+                           str_detect(term, "Birds") ~ 2,
+                           str_detect(term, "Lichens") ~ 3,
+                           str_detect(term, "Mammals") ~ 4,
+                           str_detect(term, "Molluscs") ~ 5,
+                           str_detect(term, "Mosses") ~ 6,
+                           str_detect(term, "Reptiles") ~ 7,
+                           str_detect(term, "VascularPlants") ~ 8,
+                           str_detect(term, "Threatened") ~ 9,
+                           str_detect(term, "Endangered") ~ 10,
+                           str_detect(term, "Rangesize") ~ 11,
+                           str_detect(term, "Year") ~ 12,
+                           str_detect(term, "CCThreat") ~ 13),
+         term = str_replace(term, "VascularPlants","Vascular Plants"),
+         term = str_replace(term, "Rangesize", "Range size"),
+         term = str_replace(term, "Year", "Year listed"),
+         term = str_replace(term, "CCThreat", "CC Threat (Y)"),
+         term = fct_reorder(term, ord, .desc = TRUE)
+         ) %>% 
+  arrange(desc(ord), estimate)
+
+m7_plt <- m7_plt_data %>% 
+  ggplot(aes(term, estimate))+
+  theme_classic()+
+  ggtitle("SDM research effort model")+
+  geom_hline(yintercept = 0, col = "grey", size = 0.2)+
+  geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
+  geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
+  geom_point(shape = m7_plt_data$group, size = 4, stroke = 1.5)+ 
+  scale_color_manual(values = c("black", "black"))+
+  ylim(-1.15, 2)+
+  coord_flip()+
+  #scale_x_discrete(labels = labs1)+
+  labs(y = "Standardized effect (95% CI)", x = NULL)+
+  theme(axis.text.x = element_text(size = 11),
+        axis.text.y = element_text(size = 11),
+        axis.title.x = element_text(size = 11.5))
+
+# M8: reserach effort for CC-SDMs #=============================================
+
+m8_plt_data <- sjPlot::plot_model(m8_std_clean, sort.est = FALSE, title = "CC-SDM research effort model",
+                               transform = NULL)$data  %>% 
+  mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
+                           str_detect(term, "Birds") ~ 1,
+                           str_detect(term, "Lichens") ~ 1,
+                           str_detect(term, "Mammals") ~ 1,
+                           str_detect(term, "Molluscs") ~ 1,
+                           str_detect(term, "Mosses") ~ 1,
+                           str_detect(term, "Reptiles") ~ 1,
+                           str_detect(term, "VascularPlants") ~ 1,
+                           str_detect(term, "Threatened") ~ 2,
+                           str_detect(term, "Endangered") ~ 2,
+                           str_detect(term, "Rangesize") ~ 3,
+                           str_detect(term, "Year") ~ 4,
+                           str_detect(term, "CCThreat") ~ 5), 
+         ord = case_when(str_detect(term, "Amphibians") ~ 1,
+                           str_detect(term, "Birds") ~ 2,
+                           str_detect(term, "Lichens") ~ 3,
+                           str_detect(term, "Mammals") ~ 4,
+                           str_detect(term, "Molluscs") ~ 5,
+                           str_detect(term, "Mosses") ~ 6,
+                           str_detect(term, "Reptiles") ~ 7,
+                           str_detect(term, "VascularPlants") ~ 8,
+                           str_detect(term, "Threatened") ~ 9,
+                           str_detect(term, "Endangered") ~ 10,
+                           str_detect(term, "Rangesize") ~ 11,
+                           str_detect(term, "Year") ~ 12,
+                           str_detect(term, "CCThreat") ~ 13),
+         term = str_replace(term, "VascularPlants","Vascular Plants"),
+         term = str_replace(term, "Rangesize", "Range size"),
+         term = str_replace(term, "Year", "Year listed"),
+         term = str_replace(term, "CCThreat", "CC Threat (Y)"),
+         term = fct_reorder(term, ord, .desc = TRUE)
+         ) %>% 
+  arrange(desc(ord), estimate)
+
+m8_plt <- m8_plt_data %>% 
+  ggplot(aes(term, estimate))+
+  theme_classic()+
+  ggtitle("SDM-CC research effort model")+
+  geom_hline(yintercept = 0, col = "grey", size = 0.2)+
+  geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
+  geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
+  geom_point(shape = m8_plt_data$group, size = 4, stroke = 1.5)+ 
+  scale_color_manual(values = c("black", "black"))+
+  ylim(-1.15, 2)+
+  coord_flip()+
+  #scale_x_discrete(labels = labs1)+
+  labs(y = "Standardized effect (95% CI)", x = NULL)+
+  theme(axis.text.x = element_text(size = 11),
+        axis.text.y = element_text(size = 11),
+        axis.title.x = element_text(size = 11.5))
+
+# Plot figure #=================================================================
+
+cowplot::plot_grid(m1_plt, m2_plt, m7_plt, m8_plt, nrow = 2, labels = c('A', 'B', 'C', 'D'))
+```
+
+```{r}
+#save figure
+jpeg(paste0(path,"/figures/fig_glm_results.jpeg"), units="in", width=10, height=8, res=1000)
+cowplot::plot_grid(m1_plt, m2_plt, m7_plt, m8_plt, nrow = 2, labels = c('A', 'B', 'C', 'D'))
+dev.off()
+```
+
+```{r, echo = FALSE, warning = FALSE}
+
+# clean environment of all model data
+rm(m1_plt, m2_plt, m3_plt, m4_plt, m5_plt, m6_plt, m7_plt, m8_plt,
+   m1_std, m2_std, m3_std, m4_std, m5_std, m6_std, m7_std, m8_std,
+   m1_std_clean, m2_std_clean, m3_std_clean, m4_std_clean, m5_std_clean, m6_std_clean, m7_std_clean, m8_std_clean, 
+   m1_plt_data, m2_plt_data, m3_plt_data, m4_plt_data, m5_plt_data, m6_plt_data, m7_plt_data, m8_plt_data)
+
+```
+
+
+## Use and applications of SDMs in listing documents
 
 ```{r, echo = FALSE}
 # SET UP DATABASE FOR ANALYSES
@@ -1086,7 +2026,7 @@ dev.off()
 rm(fig_pnl_sdm_uses_ld)
 ```
 
-## 3.3 Availability vs use of SDM-CC papers
+## Availability vs use of SDM-CC papers
 
 ```{r, echo = FALSE}
 
@@ -1216,904 +2156,6 @@ sarsdm %>%
   kable()
 ```
 
-## 3.4 Trends in available SDM literature
-
-**Summary of number of papers obtained and species included**
-
-```{r, echo = FALSE}
-#get dataframes from paper database summarising number of papers and species modelled
-
-#dataframe including rows that include North American SDM
-sdm_na <- paper_db %>% filter (sdm_na == "1")
-
-#dataframe including rows that include North American SDM-CC
-cc_sdm_na <- paper_db %>% filter (cc_sdm_na == "1")
-
-#dataframe including rows that include Canada-inclusive SDM
-sdm_ca <- paper_db %>% filter (sdm_ca =="1")
-
-#dataframe including rows that include Canada-inclusive SDM-CC
-cc_sdm_ca <- paper_db %>% filter (cc_sdm_ca =="1") 
-```
-
--   We obtained `r length(unique(sdm_na$paperID))` **North American SDM papers**, which included `r length(unique(sdm_na$species))` unique species.
--   We obtained `r length(unique(cc_sdm_na$paperID))` **North American SDM-CC papers**, which included `r length(unique(cc_sdm_na$species))` unique species.
--   We obtained `r length(unique(sdm_ca$paperID))` **Canada-inclusive SDM papers**, which included `r length(unique(sdm_ca$species))` unique species.
--   We obtained `r length(unique(cc_sdm_ca$paperID))` **Canada-inclusive SDM-CC papers**, which included `r length(unique(cc_sdm_ca$species))` unique species.
-
-```{r, echo = FALSE}
-#clean environment
-rm(sdm_na, sdm_ca, cc_sdm_na, cc_sdm_ca)
-```
-
-**SDM-CC paper objectives**
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of SDM-CC papers with each category of objective. SDM-CC papers could have as many objectives as required to reflect the paper."
-
-# get number of SDM-CC papers with CC vulnerability objective
-cc_vul_obj <- paper_db %>% 
-  filter (cc_sdm_na == "1") %>%
-  group_by(obj_cc_vulnerability) %>%
-  summarise (n_ppr = n_distinct(paperID)) %>% 
-  ungroup() %>% 
-  filter(obj_cc_vulnerability == "1") %>%
-  mutate(objective = factor(obj_cc_vulnerability,
-                            labels = c("CC Vulnerability"))) %>%
-  select(objective, n_ppr) 
-
-# get number of SDM-CC papers with conservation objective
-cons_obj <- paper_db %>% 
-  filter (cc_sdm_na == "1") %>%
-  group_by(obj_conservation) %>%
-  summarise (n_ppr = n_distinct(paperID)) %>% 
-  ungroup() %>% 
-  filter(obj_conservation == "1") %>%
-  mutate(objective = factor(obj_conservation,
-                            labels = c("Conservation"))) %>%
-  select(objective, n_ppr) 
-
-# get number of SDM-CC papers with methodology objective
-meth_obj <- paper_db %>% 
-  filter (cc_sdm_na == "1") %>%
-  group_by(obj_method) %>%
-  summarise (n_ppr = n_distinct(paperID)) %>% 
-  ungroup() %>% 
-  filter(obj_method == "1") %>%
-  mutate(objective = factor(obj_method,
-                            labels = c("Methodology"))) %>%
-  select(objective, n_ppr) 
-
-# get number of SDM-CC papers with other objective
-oth_obj <- paper_db %>% 
-  filter (cc_sdm_na == "1") %>%
-  group_by(obj_other) %>%
-  summarise (n_ppr = n_distinct(paperID)) %>% 
-  ungroup() %>% 
-  filter(obj_other == "1") %>%
-  mutate(objective = factor(obj_other,
-                            labels = c("Other"))) %>%
-  select(objective, n_ppr) 
-
-bind_rows(cc_vul_obj, cons_obj, meth_obj, oth_obj) %>%
-  kable()
-
-```
-
-**Applications of SDM-No CC papers obtained**
-
-```{r, echo = FALSE}
-sdm_n_cc <- paper_db %>% filter (sdm_no_cc_na == "1")
-```
-
--   The number of SDMs without CC: `r n_distinct(sdm_n_cc$paperID)`
--   The number of species included in SDMs w out CC: `r n_distinct(sdm_n_cc$species)`
-
-```{r, echo = FALSE}
-paper_db %>%
-  filter (sdm_na == "1", cc_sdm_na != "1") %>%
-  group_by(built_sdm_historical, built_sdm_present, proj_future, proj_present, backcast) %>%
-  summarise(n_ppr = n_distinct(paperID)) %>%
-  rename(b_historial = built_sdm_historical,
-         b_present = built_sdm_present,
-         p_future = proj_future,
-         p_back = backcast,
-         p_present = proj_present) %>% kable()
-```
-
-**Full vs partial range in Canada-inclusive SDM papers**
-
-```{r, echo = FALSE}
-#| tbl-cap: "Total number of Canada-inclusive SDM papers that used full vs partial range species data to build SDM"
-
-paper_db %>% 
-  filter (sdm_ca == "1") %>%
-  summarise(n_ppr = n_distinct(paperID),
-            .by = spatial_limits) %>%
-  mutate(spatial_limits = factor(spatial_limits,
-                                 levels = c("1","2","3","4","0"),
-                                 labels = c("Full range", "Partial range", "Partial range", "Partial range", "Unclear"))) %>%
-  kable()
-```
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of species included in a full range Canada-inclusive SDM at least once"
-paper_db %>% filter (sdm_ca == "1") %>%
-  mutate(spatial_limitsF = factor(spatial_limits,
-                                 levels = c("1","2","3","4","0"), #create levels
-                                 labels = c("full at least once", "partial only", "partial only", "partial only", "unclear only"), # create new labels for the factor so that 2, 3, 4 are all treated as partial
-                                 ordered = TRUE)) %>%
-  group_by(species) %>%
-  mutate(min_spatial_limit = min(spatial_limitsF)) %>% #this field will contain whether a species was modelled at full range at least once
-  ungroup() %>%
-  select(species, taxonomic_group, min_spatial_limit) %>%
-  group_by(min_spatial_limit) %>%
-  summarise(n_sp = n_distinct(species)) %>% kable()
-```
-
-**Full vs partial range in Canada-inclusive SDM-CC papers**
-
-```{r, echo = FALSE}
-#| tbl-cap: "Total number of Canada-inclusive SDM-CC papers that use full vs partial range species data to build SDM"
-paper_db %>% 
-  filter (cc_sdm_ca == "1") %>%
-  summarise(n_ppr = n_distinct(paperID),
-            .by = spatial_limits) %>%
-  mutate(spatial_limits = factor(spatial_limits,
-                                 levels = c("1","2","3","4","0"),
-                                 labels = c("Full range", "Partial range", "Partial range", "Partial range", "Unclear"))) %>%
-  kable()
-```
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of species included in a full range Canada-inclusive SDM-CC at least once"
-paper_db %>% filter (cc_sdm_ca == "1") %>%
-  mutate(spatial_limitsF = factor(spatial_limits,
-                                 levels = c("1","2","3","4","0"), #create levels
-                                 labels = c("full at least once", "partial only", "partial only", "partial only", "unclear only"), # create new labels for the factor so that 2, 3, 4 are all treated as partial
-                                 ordered = TRUE)) %>%
-  group_by(species) %>%
-  mutate(min_spatial_limit = min(spatial_limitsF)) %>% #this field will contain whether a species was modelled at full range at least once
-  ungroup() %>%
-  select(species, taxonomic_group, min_spatial_limit) %>%
-  group_by(min_spatial_limit) %>%
-  summarise(n_sp = n_distinct(species)) %>%
-  kable()
-```
-
-**Number of species per paper**
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of papers vs number of species (Canadian SAR + others) focused on in a single SDM paper. num_species = 1 means that the paper was species specific"
-paper_db %>% filter (sdm_na == "1") %>%
-  summarise(n_ppr = n_distinct(paperID),
-            .by = num_species) %>%
-  mutate(num_species = as.numeric(num_species)) %>%
-  arrange(num_species) %>% 
-  kable()
-```
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of papers vs number of species (Canadian SAR + others) focused on in a single SDM-CC paper. num_species = 1 means that the paper was species specific"
-paper_db %>% filter (cc_sdm_na == "1") %>%
-  summarise(n_ppr = n_distinct(paperID),
-            .by = num_species) %>%
-  mutate(num_species = as.numeric(num_species),
-         n_ppr = as.numeric(n_ppr)) %>%
-  arrange(num_species) %>% kable()
-```
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of papers vs number of Canadian SAR (i.e., CAN-SAR species) included in a single SDM paper"
-
-n_sar_sdm <- paper_db %>% filter (sdm_na == "1") %>%
-  group_by(paperID) %>%
-  mutate(n_sar = n_distinct(species)) %>%
-  ungroup() %>%
-  summarise(n_ppr = n_distinct(paperID),
-            .by = n_sar) %>%
-  arrange(n_sar)
-
-n_sar_sdm %>% kable()
-```
-
-The maximum number of SAR included in a single SDM paper: `r max(n_sar_sdm$n_sar)`
-
-```{r, echo = FALSE}
-max_n_sar_ppr <- paper_db %>% filter (sdm_na == "1") %>%
-  group_by(paperID) %>%
-  mutate(n_sar = n_distinct(species)) %>%
-  ungroup() %>%
-  filter (n_sar == max(n_sar_sdm$n_sar))
-```
-
-The paper: `r unique(max_n_sar_ppr$doc_citation)`
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of papers vs number of Canadian SAR (i.e., CAN-SAR species) included in a single SDM-CC paper"
-n_sar_cc_sdm <- paper_db %>% filter (cc_sdm_na == "1") %>%
-  group_by(paperID) %>%
-  mutate(n_sar = n_distinct(species)) %>%
-  ungroup() %>%
-  summarise(n_ppr = n_distinct(paperID),
-            .by = n_sar) %>%
-  arrange(n_sar)
-
-n_sar_cc_sdm %>% kable()
-```
-
-The maximum number of SAR included in a single SDM-CC paper: `r max(n_sar_cc_sdm$n_sar)`
-
-```{r, echo = FALSE}
-max_n_sar_ppr <- paper_db %>% filter (cc_sdm_na == "1") %>%
-  group_by(paperID) %>%
-  mutate(n_sar = n_distinct(species)) %>%
-  ungroup() %>%
-  filter (n_sar == max(n_sar_cc_sdm$n_sar))
-```
-
-The paper: `r unique(max_n_sar_ppr$doc_citation)`
-
-```{r, echo = FALSE}
-#clean environment
-rm(max_n_sar_ppr, 
-   n_sar_sdm,
-   n_sar_cc_sdm)
-```
-
-**Proportion of species included in at least one paper by taxa**
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number (n) and proportion (prop_taxa) of species in each taxonomic group with SDMs. Proportions are based on total number of species in each group."
-
-# total number of species per taxa
-sp_taxa <- sarsdm %>%
-  group_by(taxonomic_group) %>%
-  summarise (n_taxa = n_distinct(species))
-
-na_db <- sarsdm %>%
-  group_by(taxonomic_group, cc_sdm, sdm) %>%
-  summarise(n = n_distinct(species)) %>%
-  ungroup() %>%
-  mutate(label = paste0(cc_sdm, sdm),
-         label = factor(label,
-                        levels = c("00", "11","01"),
-                        labels = c("No SDM","SDM-CC", "SDM-No CC only")),
-         scope = c("North America"))
-
-na_db <- merge(na_db, sp_taxa, by = "taxonomic_group") %>%
-  mutate(prop_taxa = n/n_taxa)
-
-na_db %>%
-  mutate(prop_taxa = round(prop_taxa, digits = 2)) %>%
-  select(taxonomic_group, label, n, prop_taxa) %>%
-  kable()
-```
-
-**Figure 4**
-
-```{r, echo = FALSE}
-#get data showing number of papers that fit each category (SDM, SDM-CC, and Canada-inclusive)
-
-tot_ppr_taxa <- paper_db %>%
-  filter(sdm_na == "1") %>%
-  group_by(taxonomic_group) %>%
-  summarise(n_ppr_taxa = n_distinct(paperID))
-
-fig_ppr_db <- paper_db %>%
-  group_by(taxonomic_group, sdm_na, sdm_ca, cc_sdm_na, cc_sdm_ca) %>%
-  summarise(n_ppr = n_distinct(paperID)) %>%
-  mutate(label = paste0(sdm_na, sdm_ca, cc_sdm_na, cc_sdm_ca),
-         label = factor(label,
-                        levels = c("0000",
-                                   "1111",
-                                   "1010",
-                                   "1100",
-                                   "1000"),
-                        #labels = c("remove", "CC-SDM inc. Canada", "CC-SDM exc. Canada", "SDM w/out CC inc. Canada", "SDM w/out CC exc. Canada"))
-                        labels = c("remove", "CC-SDM inc. Canada", "CC-SDM exc. Canada", "SDM inc. Canada", "SDM exc. Canada"))
-         ) %>%
-  filter (label != "remove") 
-
-fig_ppr_db <- merge(fig_ppr_db, tot_ppr_taxa, by = "taxonomic_group")
-fig_ppr_db <- fig_ppr_db %>%
-  mutate(prop_ppr = n_ppr / n_ppr_taxa)
-```
-
-```{r, echo = FALSE}
-
-# Panel A = number of papers per taxa, broken down by SDM and CC-SDM
-fig_pnl_num_ppr <- fig_ppr_db %>%
-  mutate(taxonomic_group = factor(taxonomic_group,
-                                  levels = c("Amphibians", "Arthropods","Birds","Lichens","Mammals (terrestrial)","Molluscs","Mosses","Reptiles","Vascular Plants"),
-                                  labels = c("Amphibians", "Arthropods","* Birds","Lichens","Mammals","Molluscs","Mosses","Reptiles","Vascular Plants")),
-         label = factor(label,
-                        labels = c("SDM-CC inc. Canada", "SDM-CC exc. Canada", "SDM-No CC inc. Canada", "SDM-No CC exc. Canada")),
-         label = str_wrap(label, width = 15)) %>%
-  ggplot(aes(x = forcats::fct_rev(taxonomic_group), y = n_ppr, fill = label)) +
-  geom_bar(position = "stack", stat = "identity") +
-  scale_fill_manual(values = c('#B2DF8A', # Canada-inclusive CC-SDM
-                               '#33A02B', # Canada-exclusive CC-SDM
-                               '#A5CEE2', # Canada-inclusive SDM w/out CC
-                               '#1F78B4')) + # Canada-exclusive SDM w/out CC
-  #scale_fill_brewer(palette = "Paired") +
-  guides(fill = guide_legend(reverse=T)) +
-  theme_classic() +
-  coord_flip() +
-  xlab(element_blank()) +
-  ylab("Number of papers") +
-  #scale_y_continuous(expand = c(0,0)) +
-  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
-  theme(legend.title = element_blank(),
-        legend.key.spacing.y = unit(.2, "cm"),
-        axis.text.y = element_text(size = 10.5),
-        axis.text.x = element_text(size = 10.5),
-        legend.text = element_text(size = 10))
-
-# create database to use when labelling # of species on bar graphs
-sp_taxa_label <- sp_taxa %>%
-  mutate(taxonomic_group = factor(taxonomic_group,
-                                  levels = c("Amphibians","Arthropods","Birds","Lichens","Mammals (terrestrial)","Molluscs","Mosses","Reptiles","Vascular Plants"),
-                                  labels =c("Amphibians", "Arthropods", "* Birds", "Lichens", "Mammals", "Molluscs", "Mosses", "Reptiles", "Vascular Plants")))
-
-
-# Panel B = prop species per taxa included in SDM papers
-
-na_db_alt <- sarsdm %>%
-  group_by(taxonomic_group, cc_sdm, sdm_no_cc) %>%
-  summarise(n = n_distinct(species))
-
-na_db_alt <- merge(na_db_alt, sp_taxa, by = "taxonomic_group")
-
-na_db_alt <- na_db_alt %>% 
-  mutate(prop_taxa = n/n_taxa,
-         label = paste0(cc_sdm, sdm_no_cc),
-         label = factor(label,
-                        levels = c("00", "01", "10", "11"),
-                        labels = c("No SDM","SDM-No CC", "SDM-CC", "SDM-CC &\nSDM-No CC")),
-         scope = c("North America"))
-
-fig_pnl_prop_sp_model <- na_db_alt %>%
-  mutate(taxonomic_group = factor(taxonomic_group,
-                                  labels = c("Amphibians","Arthropods","* Birds","Lichens","Mammals","Molluscs","Mosses","Reptiles","Vascular Plants"))) %>%
-  ggplot(aes(x = forcats::fct_rev(taxonomic_group), y = prop_taxa, fill = label)) +
-  geom_bar(position = "stack", stat = "identity") +
-  geom_text(aes(taxonomic_group, 1.05, label = n_taxa, fill = NULL), size = 3, colour = '#36454F', data = sp_taxa_label) +
-  theme_classic() +
-  ylab("Proportion of species") +
-  xlab(element_blank()) +
-  theme(legend.title = element_blank(),
-        axis.text.y = element_text(size = 10.5),
-        axis.text.x = element_text(size = 10.5),
-        legend.text = element_text(size = 9)) +
-  scale_fill_manual(values = c('grey', # no SDM
-                               '#1c63a5', # SDM-No CC
-                               '#2c9320', #SDM-CC
-                               '#562888' # SDM-CC &\nSDM-No CC                              
-                               ) ) + 
-  guides(fill = guide_legend(reverse=T)) +
-  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
-  coord_flip()
-```
-
-```{r, echo = FALSE}
-#| fig-cap: "A) Number of SDM papers obtained during the literature review that include each taxonomic group, broken down by SDMs that include climate change projections (SDM-CC, blue) and all other SDMs (SDM-No CC, green), as well as whether the papers were Canada-exclusive (dark colours) or Canada-inclusive (light colours). Canada-inclusivity and exclusivity represents whether data from at least a portion of the species’ Canadian range was included when building the SDM. Papers could model species from multiple taxonomic groups, thus the sum of the number of papers across groups will be greater than the total number of SDM papers (n = 176). B) Proportion of species in each taxonomic group we found through the literature review to not be included in any peer-reviewed SDMs (no SDM, grey), or that were included in at least one SDM-No CC (blue), SDM-CC (green), or both types of models (SDM-CC & SDM-No CC, purple). Proportion of species in any SDM = sum of proportion of species across the three SDM groups. Proportions are based on the total number of species in each group (number at right end of bars). The proportion of species by taxonomic group included in Canada-inclusive SDMs is almost indistinguishable and thus not shown here (see Figure S3). * Note that a partial literature review was completed for Birds (see Section 2.2)"
-#| fig-width: 6
-#| fig-height: 4
-
-plot_grid(fig_pnl_num_ppr,
-          fig_pnl_prop_sp_model,
-          labels = "AUTO",
-          nrow = 2,
-          align = "hv")
-```
-
-```{r}
-#save figure
-jpeg(paste0(path,"/figures/fig_num_ppr_and_prop_sp_by_taxa.jpeg"), units="in", width=6, height=4, res=1000)
-plot_grid(fig_pnl_num_ppr,
-          fig_pnl_prop_sp_model,
-          labels = "AUTO",
-          nrow = 2,
-          align = "hv")
-dev.off()
-```
-
-**Research effort stats**
-
-All of the stats in this section exclude Birds, since we did not complete a full literature review for that taxa.
-
-```{r, echo = FALSE}
-
-re_db <- sarsdm %>% filter (taxonomic_group != "Birds") 
-```
-
--   The mean number of SDM papers found per species in the literature review (including 0's): `r mean(re_db$n_sdm)`
--   The mean number of SDM-CC papers found per species in the literature review: `r mean(re_db$n_cc_sdm)`
-
-```{r, echo = FALSE}
-#| tbl-cap: "Species and number of SDM and SDM-CC papers they were found to be included in. This table includes Bird species for reference, but likely isn't an accurate reflection of the number of papers these species are included in since we didn't complete a full literature review for this taxa. This table does not include species that were not included in any SDMs (n_sdm = 0)."
-sarsdm %>%
-  select(species, taxonomic_group, sara_status_adj, n_sdm, n_sdm_ca, n_cc_sdm, n_cc_sdm_ca) %>% 
-  #arrange(-(n_sdm)) %>%
-  arrange(-(n_sdm))%>%
-  unique() %>% 
-  filter (n_sdm != "0") %>% kable()
-```
-
-**Research effort: contrasting Canada-inclusive and Canada-exclusive papers**
-
-```{r, echo = FALSE}
-
-# create research effort database - excludes Birds 
-# add field to database showing the difference between the number of SDM papers when comparing North American SDMs and Canada-inclusive SDMs
-re_db <- re_db %>%
-  mutate(diff_n_sdm = n_sdm - n_sdm_ca,
-         diff_n_cc_sdm = n_cc_sdm - n_cc_sdm_ca) %>%
-  select (taxonomic_group, species, n_sdm, n_cc_sdm, n_sdm_ca, n_cc_sdm_ca, diff_n_sdm, diff_n_cc_sdm) %>%
-  unique()
-```
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of species vs difference in the number of North American and Canada-inclusive SDM papers. The summary in this table only includes species that were included in at least one North American SDM. diff_n_sdm = 0 means that all of the papers the species was included in were Canada-inclusive."
-
-re_db %>% 
-  filter (n_sdm != "0") %>% #filter to only include species that are modelled in SDM at least once so that 0's represent no change in the number of SDMs, rather than species that were included in 0 papers to begin with
-  summarise(n_sp = n_distinct(species),
-            .by = diff_n_sdm) %>% 
-  arrange(diff_n_sdm) %>% kable()
-```
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of species vs difference in the number of North American and Canada-inclusive SDM-CC papers. The summary in this table only includes species that were included in at least one North American SDM-CC paper. diff_n_cc_sdm = 0 means that all of the SDM-CCpapers the species was included in were Canada-inclusive."
-
-re_db %>% 
-  filter (n_cc_sdm != "0") %>% #filter to only include species that are modelled in SDM-CC at least once so that 0's represent no change in the number of SDM-CC, rather than species that were included in 0 papers to begin with
-  summarise(n_sp = n_distinct(species),
-            .by = diff_n_cc_sdm) %>% 
-  arrange(diff_n_cc_sdm) %>% kable()
-```
-
-```{r, echo = FALSE}
-#| tbl-cap: "List of species that have been included in at least one North American SDM paper, showing the difference (diff_n_sdm) between the number of SDM papers when comparing North Amercian SDM papers to Canada inclusive. diff_n_sdm = number of North American SDM papers - number of Canada-inclusive papers. Therefore, high values of diff_n_sdm indicate that the species was included in a lot of Canada-exclusive papers, while a value of 0 means that the species was only included in Canada-inclusive papers."
-
-re_db %>%
-  filter (n_sdm != "0") %>%
-  select (taxonomic_group, species, diff_n_sdm) %>%
-  unique() %>%
-  arrange(-(diff_n_sdm)) %>%
-  kable()
-```
-
-```{r, echo = FALSE}
-#| tbl-cap: "List of species that have been included in at least one North American SDM-CC paper, showing the difference (diff_n_cc_sdm) between the number of SDM-CC papers when comparing North Amercian SDM-CC papers to Canada inclusive. diff_n_cc_sdm = number of North American SDM-CC papers - number of Canada-inclusive papers. Therefore, high values of diff_n_cc_sdm indicate that the species was included in a lot of Canada-exclusive papers, while a value of 0 means that the species was only included in Canada-inclusive papers."
-
-re_db %>%
-  filter (n_cc_sdm != "0") %>%
-  select (taxonomic_group, species, diff_n_cc_sdm) %>%
-  unique() %>%
-  arrange(-(diff_n_cc_sdm)) %>%
-  kable()
-```
-
-**Figure 5**
-
-```{r, echo = FALSE}
-# get binned research effort data
-
-max_p <- max(re_db$n_sdm) # max number of SDMs, to assign break limit
-
-# North American binned data #==================================================
-## SDM ##=======================================================================
-
-re_na_sdm_bin <- re_db %>%
-  mutate(n_paper_cat = cut(n_sdm,
-                           breaks = c(-1, 0, 1, 5, 10, max_p),
-                           labels = c("0", "1","2-5","6-10", paste0("11-",max_p)))) %>%
-  group_by(taxonomic_group) %>%
-  mutate(n_sp_taxa = n_distinct(species)) %>%
-  ungroup() %>%
-  group_by(taxonomic_group, n_paper_cat) %>%
-  mutate(n_sp_re = n_distinct(species),
-         prop_sp = round(n_sp_re / n_sp_taxa, digits = 3)) %>%
-  ungroup() %>%
-  select(taxonomic_group, n_paper_cat, n_sp_re, prop_sp) %>%
-  unique() %>%
-  arrange(taxonomic_group, n_paper_cat) %>% 
-  mutate(taxonomic_group = factor(taxonomic_group,
-                                  levels = c("Amphibians",
-                                                   "Arthropods",
-                                                   "Birds",
-                                                   "Lichens",
-                                                   "Mammals (terrestrial)",
-                                                   "Molluscs",
-                                                   "Mosses",
-                                                   "Reptiles",
-                                                   "Vascular Plants"),
-                                        labels = c("Amphibians",
-                                                   "Arthropods",
-                                                   "Birds",
-                                                   "Lichens",
-                                                   "Mammals",
-                                                   "Molluscs",
-                                                   "Mosses",
-                                                   "Reptiles",
-                                                   "Vascular Plants")),
-         n_paper_cat = factor(n_paper_cat),
-         label = c("SDM"),
-         scope = c("North American"))
-
-## CC-SDM ##====================================================================
-
-re_na_cc_sdm_bin <- re_db %>%
-  mutate(n_paper_cat = cut(n_cc_sdm,
-                           breaks = c(-1, 0, 1, 5, 10, max_p),
-                           labels = c("0", "1","2-5","6-10", paste0("11-",max_p)))) %>%
-  group_by(taxonomic_group) %>%
-  mutate(n_sp_taxa = n_distinct(species)) %>%
-  ungroup() %>%
-  group_by(taxonomic_group, n_paper_cat) %>%
-  mutate(n_sp_re = n_distinct(species),
-         prop_sp = round(n_sp_re / n_sp_taxa, digits = 3)) %>%
-  ungroup() %>%
-  select(taxonomic_group, n_paper_cat, n_sp_re, prop_sp) %>%
-  unique() %>%
-  arrange(taxonomic_group, n_paper_cat) %>% 
-  mutate(taxonomic_group = factor(taxonomic_group,
-                                  levels = c("Amphibians",
-                                                   "Arthropods",
-                                                   "Birds",
-                                                   "Lichens",
-                                                   "Mammals (terrestrial)",
-                                                   "Molluscs",
-                                                   "Mosses",
-                                                   "Reptiles",
-                                                   "Vascular Plants"),
-                                        labels = c("Amphibians",
-                                                   "Arthropods",
-                                                   "Birds",
-                                                   "Lichens",
-                                                   "Mammals",
-                                                   "Molluscs",
-                                                   "Mosses",
-                                                   "Reptiles",
-                                                   "Vascular Plants")),
-         label = c("CC-SDM"),
-         scope = c("North American"))
-
-re_na_cc_sdm_bin <- rows_append(re_na_cc_sdm_bin, tibble(taxonomic_group = "Amphibians", n_paper_cat = paste0("11-",max_p), n_sp_re = 0, prop_sp = 0, label = "CC-SDM", scope = "North America")) %>%
-  mutate(n_paper_cat = factor(n_paper_cat))
-
-```
-
-```{r, echo = FALSE}
-#| fig-cap: "Proportion of species in each taxonomic group with each level of research effort (i.e., binned number of papers a species was included in). A) SDM research effort B) SDM-CC research effort (SDM-CC are a subset of the SDMs that include climate change projections). Proportions are based on the total number of species in each taxa (numbers at right end of bars). Birds are not included in this analysis (see Section 2.2). Research effort for the subset of SDM and SDM-CC papers that are Canada-inclusive can be found in the Supplementary (Figure S4)"
-#| fig-width: 6
-#| fig-height: 4
-
-sp_taxa_label_re <- sp_taxa_label %>% filter (taxonomic_group != "* Birds") #exclude Birds from analysis
-
-# SDM research effort panel
-fig_pnl_sdm_re <- re_na_sdm_bin %>%
-  mutate(n_paper_cat_rev = factor(n_paper_cat,
-                                  levels = c("11-16",
-                                             "6-10",
-                                             "2-5",
-                                             "1",
-                                             "0"))) %>%
-  ggplot(aes(x = forcats::fct_rev(taxonomic_group), y = prop_sp, fill = n_paper_cat_rev)) +
-  ggtitle("SDMs")+
-  geom_bar(position = "stack", stat = "identity") +
-  geom_text(aes(taxonomic_group, 1.05, label = n_taxa, fill = NULL), size = 3, colour = '#36454F', data = sp_taxa_label_re) +
-  theme_classic() +
-  #scale_fill_manual(values = c('#0c5c21','#379e4b','#93d289','#dff4da','grey'))+
-  #scale_fill_manual(values=c('#0C3D8A','#367db7','#8dbddb','#d5e6f6','grey')) +
-  scale_fill_manual(values=c('#2f006a', '#553b92','#8d85be','#d0d1e5','grey')) +
-  ylab("Proportion of species") +
-  xlab(element_blank()) +
-  labs(fill = "Number of papers") +
-  theme(axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
-        legend.title = element_text(size = 10),
-        legend.text = element_text(size = 10),
-        legend.key.size = unit(.5, "cm")) +
-  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
-  guides(fill = guide_legend(reverse=T)) +
-  coord_flip()
-
-# SDM-CC research effort panel
-fig_pnl_cc_sdm_re <- re_na_cc_sdm_bin %>%
-  mutate(n_paper_cat_rev = factor(n_paper_cat,
-                                  levels = c("11-16",
-                                             "6-10",
-                                             "2-5",
-                                             "1",
-                                             "0"))) %>%
-  filter(prop_sp != 0) %>%
-  ggplot(aes(x = forcats::fct_rev(taxonomic_group), y = prop_sp, fill = n_paper_cat_rev)) +
-  ggtitle("SDM-CC (subset of SDMs)")+
-  geom_bar(position = "stack", stat = "identity") +
-  geom_text(aes(taxonomic_group, 1.05, label = n_taxa, fill = NULL), size = 3, colour = '#36454F', data = sp_taxa_label_re) +
-  theme_classic() +
-  scale_fill_manual(values = c('#0c5c21','#379e4b','#dff4da','grey')) +
-  #scale_fill_manual(values=c('#367db7','#8dbddb','#d5e6f6','grey'))+
-  ylab("Proportion of species") +
-  xlab(element_blank()) +
-  labs(fill = "Number of papers") +
-  theme(axis.text.x = element_text(size = 10),
-        axis.text.y = element_text(size = 10),
-        legend.title = element_text(size = 10),
-        legend.text = element_text(size = 10),
-        legend.key.size = unit(.5, "cm")) +
-  scale_y_continuous(expand = expansion(mult = c(0, .05))) +
-  guides(fill = guide_legend(reverse=T)) +
-  coord_flip()
-
-plot_grid(fig_pnl_sdm_re, fig_pnl_cc_sdm_re,
-          nrow = 2,
-          labels = "AUTO")
-```
-
-```{r}
-#save figure
-jpeg(paste0(path,"/figures/fig_research_effort.jpeg"), units="in", width=6, height=4, res=1000)
-plot_grid(fig_pnl_sdm_re, fig_pnl_cc_sdm_re,
-          nrow = 2,
-          labels = "AUTO")
-dev.off()
-```
-
-## 3.5 Inclusion and research effort regression models
-
-**Figure 6**
-
-```{r, echo = FALSE}
-#| fig-cap: "A) Standardized effect sizes (coefficients and 95% confidence intervals[CI]) from A) the SDM inclusion model, B) the SDM-CC inclusion model, C) SDM research effort model, D) SDM-CC research model. SDM and SDM-CC inclusion GLMs predict probability of inclusion in a SDM or SDM-CC paper based on whether a paper that includes the species was obtained in the literature review, and were built with a Binomial distribution and logit link. SDM and SDM-CC research effort GLMs predict the number of SDM or SDM-CC papers that include each species, based on the results of the literature review, and were built with a Quasipoisson distribution with a log link. The four models share most of the same covariates: taxonomic group (8 levels; Amphibians excluded from SDM inclusion model, Birds excluded from both research effort models), SARA status (3 levels), range size (square root transformed for SDM inclusion model and both research effort models, log transformed in SDM-CC inclusion model), and year of listing under SARA. SDM-CC inclusion and research effort models include an additional covariate - whether climate change was listed as a threat in the species’ Canadian policy documents (CC threat; Y/N). Symbols in all panels reflect modelled covariate groupings. In all models, the reference level for taxonomic group is ‘Arthropods’, for SARA status it is ‘Special Concern’ and in the SDM-CC inclusion and research effort models, the reference level for CC threat is ‘No’.  For more details see Tables S4-S7."
-#| fig-width: 10
-#| fig-height: 8
-
-# M1: probability of inclusion in SDM #=========================================
-
-m1_plt_data <- sjPlot::plot_model(m1_std_clean, sort.est = FALSE, title = "SDM inclusion model",
-                               transform = NULL)$data  %>% 
-  mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
-                           str_detect(term, "Birds") ~ 1,
-                           str_detect(term, "Lichens") ~ 1,
-                           str_detect(term, "Mammals") ~ 1,
-                           str_detect(term, "Molluscs") ~ 1,
-                           str_detect(term, "Mosses") ~ 1,
-                           str_detect(term, "Reptiles") ~ 1,
-                           str_detect(term, "VascularPlants") ~ 1,
-                           str_detect(term, "Threatened") ~ 2,
-                           str_detect(term, "Endangered") ~ 2,
-                           str_detect(term, "Rangesize") ~ 3,
-                           str_detect(term, "Year") ~ 4,
-                           str_detect(term, "CCThreat") ~ 5), 
-         ord = case_when(str_detect(term, "Amphibians") ~ 1,
-                           str_detect(term, "Birds") ~ 2,
-                           str_detect(term, "Lichens") ~ 3,
-                           str_detect(term, "Mammals") ~ 4,
-                           str_detect(term, "Molluscs") ~ 5,
-                           str_detect(term, "Mosses") ~ 6,
-                           str_detect(term, "Reptiles") ~ 7,
-                           str_detect(term, "VascularPlants") ~ 8,
-                           str_detect(term, "Threatened") ~ 9,
-                           str_detect(term, "Endangered") ~ 10,
-                           str_detect(term, "Rangesize") ~ 11,
-                           str_detect(term, "Year") ~ 12,
-                           str_detect(term, "CCThreat") ~ 13),
-         term = str_replace(term, "VascularPlants","Vascular Plants"),
-         term = str_replace(term, "Rangesize", "Range size"),
-         term = str_replace(term, "Year", "Year listed"),
-         term = str_replace(term, "CCThreat", "CC Threat (Y)"),
-         term = fct_reorder(term, ord, .desc = TRUE)
-         ) %>% 
-  arrange(desc(ord), estimate)
-
-m1_plt <- m1_plt_data %>% 
-  ggplot(aes(term, estimate))+
-  theme_classic()+
-  ggtitle("SDM inclusion model")+
-  geom_hline(yintercept = 0, col = "grey", size = 0.2)+
-  geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
-  geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
-  geom_point(shape = m1_plt_data$group, size = 4, stroke = 1.5)+ 
-  scale_color_manual(values = c("black", "black"))+
-  ylim(-1.15, 2)+
-  coord_flip()+
-  #scale_x_discrete(labels = labs1)+
-  labs(y = "Standardized effect (95% CI)", x = NULL) +
-  theme(axis.text.x = element_text(size = 11),
-        axis.text.y = element_text(size = 11),
-        axis.title.x = element_text(size = 11.5))
-
-
-# M2: Probability of inclusion in CC-SDM #======================================
-
-m2_plt_data <- sjPlot::plot_model(m2_std_clean, sort.est = FALSE, title = "CC-SDM inclusion model",
-                               transform = NULL)$data  %>% 
-  mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
-                           str_detect(term, "Birds") ~ 1,
-                           str_detect(term, "Lichens") ~ 1,
-                           str_detect(term, "Mammals") ~ 1,
-                           str_detect(term, "Molluscs") ~ 1,
-                           str_detect(term, "Mosses") ~ 1,
-                           str_detect(term, "Reptiles") ~ 1,
-                           str_detect(term, "VascularPlants") ~ 1,
-                           str_detect(term, "Threatened") ~ 2,
-                           str_detect(term, "Endangered") ~ 2,
-                           str_detect(term, "Rangesize") ~ 3,
-                           str_detect(term, "Year") ~ 4,
-                           str_detect(term, "CCThreat") ~ 5), 
-         ord = case_when(str_detect(term, "Amphibians") ~ 1,
-                           str_detect(term, "Birds") ~ 2,
-                           str_detect(term, "Lichens") ~ 3,
-                           str_detect(term, "Mammals") ~ 4,
-                           str_detect(term, "Molluscs") ~ 5,
-                           str_detect(term, "Mosses") ~ 6,
-                           str_detect(term, "Reptiles") ~ 7,
-                           str_detect(term, "VascularPlants") ~ 8,
-                           str_detect(term, "Threatened") ~ 9,
-                           str_detect(term, "Endangered") ~ 10,
-                           str_detect(term, "Rangesize") ~ 11,
-                           str_detect(term, "Year") ~ 12,
-                           str_detect(term, "CCThreat") ~ 13),
-         term = str_replace(term, "VascularPlants","Vascular Plants"),
-         term = str_replace(term, "Rangesize", "Range size"),
-         term = str_replace(term, "Year", "Year listed"),
-         term = str_replace(term, "CCThreat", "CC Threat (Y)"),
-         term = fct_reorder(term, ord, .desc = TRUE)
-         ) %>% 
-  arrange(desc(ord), estimate)
-
-m2_plt <- m2_plt_data %>% 
-  ggplot(aes(term, estimate))+
-  theme_classic()+
-  ggtitle("SDM-CC inclusion model")+
-  geom_hline(yintercept = 0, col = "grey", size = 0.2)+
-  geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
-  geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
-  geom_point(shape = m2_plt_data$group, size = 4, stroke = 1.5)+ 
-  scale_color_manual(values = c("black", "black"))+
-  ylim(-1.15, 2)+
-  coord_flip()+
-  #scale_x_discrete(labels = labs1)+
-  labs(y = "Standardized effect (95% CI)", x = NULL)+
-  theme(axis.text.x = element_text(size = 11),
-        axis.text.y = element_text(size = 11),
-        axis.title.x = element_text(size = 11.5))
-
-# M7: research effort for SDMs #================================================
-
-m7_plt_data <- sjPlot::plot_model(m7_std_clean, sort.est = FALSE, title = "SDM research effort model",
-                               transform = NULL)$data  %>% 
-  mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
-                           str_detect(term, "Birds") ~ 1,
-                           str_detect(term, "Lichens") ~ 1,
-                           str_detect(term, "Mammals") ~ 1,
-                           str_detect(term, "Molluscs") ~ 1,
-                           str_detect(term, "Mosses") ~ 1,
-                           str_detect(term, "Reptiles") ~ 1,
-                           str_detect(term, "VascularPlants") ~ 1,
-                           str_detect(term, "Threatened") ~ 2,
-                           str_detect(term, "Endangered") ~ 2,
-                           str_detect(term, "Rangesize") ~ 3,
-                           str_detect(term, "Year") ~ 4,
-                           str_detect(term, "CCThreat") ~ 5), 
-         ord = case_when(str_detect(term, "Amphibians") ~ 1,
-                           str_detect(term, "Birds") ~ 2,
-                           str_detect(term, "Lichens") ~ 3,
-                           str_detect(term, "Mammals") ~ 4,
-                           str_detect(term, "Molluscs") ~ 5,
-                           str_detect(term, "Mosses") ~ 6,
-                           str_detect(term, "Reptiles") ~ 7,
-                           str_detect(term, "VascularPlants") ~ 8,
-                           str_detect(term, "Threatened") ~ 9,
-                           str_detect(term, "Endangered") ~ 10,
-                           str_detect(term, "Rangesize") ~ 11,
-                           str_detect(term, "Year") ~ 12,
-                           str_detect(term, "CCThreat") ~ 13),
-         term = str_replace(term, "VascularPlants","Vascular Plants"),
-         term = str_replace(term, "Rangesize", "Range size"),
-         term = str_replace(term, "Year", "Year listed"),
-         term = str_replace(term, "CCThreat", "CC Threat (Y)"),
-         term = fct_reorder(term, ord, .desc = TRUE)
-         ) %>% 
-  arrange(desc(ord), estimate)
-
-m7_plt <- m7_plt_data %>% 
-  ggplot(aes(term, estimate))+
-  theme_classic()+
-  ggtitle("SDM research effort model")+
-  geom_hline(yintercept = 0, col = "grey", size = 0.2)+
-  geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
-  geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
-  geom_point(shape = m7_plt_data$group, size = 4, stroke = 1.5)+ 
-  scale_color_manual(values = c("black", "black"))+
-  ylim(-1.15, 2)+
-  coord_flip()+
-  #scale_x_discrete(labels = labs1)+
-  labs(y = "Standardized effect (95% CI)", x = NULL)+
-  theme(axis.text.x = element_text(size = 11),
-        axis.text.y = element_text(size = 11),
-        axis.title.x = element_text(size = 11.5))
-
-# M8: reserach effort for CC-SDMs #=============================================
-
-m8_plt_data <- sjPlot::plot_model(m8_std_clean, sort.est = FALSE, title = "CC-SDM research effort model",
-                               transform = NULL)$data  %>% 
-  mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
-                           str_detect(term, "Birds") ~ 1,
-                           str_detect(term, "Lichens") ~ 1,
-                           str_detect(term, "Mammals") ~ 1,
-                           str_detect(term, "Molluscs") ~ 1,
-                           str_detect(term, "Mosses") ~ 1,
-                           str_detect(term, "Reptiles") ~ 1,
-                           str_detect(term, "VascularPlants") ~ 1,
-                           str_detect(term, "Threatened") ~ 2,
-                           str_detect(term, "Endangered") ~ 2,
-                           str_detect(term, "Rangesize") ~ 3,
-                           str_detect(term, "Year") ~ 4,
-                           str_detect(term, "CCThreat") ~ 5), 
-         ord = case_when(str_detect(term, "Amphibians") ~ 1,
-                           str_detect(term, "Birds") ~ 2,
-                           str_detect(term, "Lichens") ~ 3,
-                           str_detect(term, "Mammals") ~ 4,
-                           str_detect(term, "Molluscs") ~ 5,
-                           str_detect(term, "Mosses") ~ 6,
-                           str_detect(term, "Reptiles") ~ 7,
-                           str_detect(term, "VascularPlants") ~ 8,
-                           str_detect(term, "Threatened") ~ 9,
-                           str_detect(term, "Endangered") ~ 10,
-                           str_detect(term, "Rangesize") ~ 11,
-                           str_detect(term, "Year") ~ 12,
-                           str_detect(term, "CCThreat") ~ 13),
-         term = str_replace(term, "VascularPlants","Vascular Plants"),
-         term = str_replace(term, "Rangesize", "Range size"),
-         term = str_replace(term, "Year", "Year listed"),
-         term = str_replace(term, "CCThreat", "CC Threat (Y)"),
-         term = fct_reorder(term, ord, .desc = TRUE)
-         ) %>% 
-  arrange(desc(ord), estimate)
-
-m8_plt <- m8_plt_data %>% 
-  ggplot(aes(term, estimate))+
-  theme_classic()+
-  ggtitle("SDM-CC research effort model")+
-  geom_hline(yintercept = 0, col = "grey", size = 0.2)+
-  geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
-  geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
-  geom_point(shape = m8_plt_data$group, size = 4, stroke = 1.5)+ 
-  scale_color_manual(values = c("black", "black"))+
-  ylim(-1.15, 2)+
-  coord_flip()+
-  #scale_x_discrete(labels = labs1)+
-  labs(y = "Standardized effect (95% CI)", x = NULL)+
-  theme(axis.text.x = element_text(size = 11),
-        axis.text.y = element_text(size = 11),
-        axis.title.x = element_text(size = 11.5))
-
-# Plot figure #=================================================================
-
-cowplot::plot_grid(m1_plt, m2_plt, m7_plt, m8_plt, nrow = 2, labels = c('A', 'B', 'C', 'D'))
-```
-
-```{r}
-#save figure
-jpeg(paste0(path,"/figures/fig_glm_results.jpeg"), units="in", width=10, height=8, res=1000)
-cowplot::plot_grid(m1_plt, m2_plt, m7_plt, m8_plt, nrow = 2, labels = c('A', 'B', 'C', 'D'))
-dev.off()
-```
-
-```{r, echo = FALSE, warning = FALSE}
-
-# clean environment of all model data
-rm(m1_plt, m2_plt, m3_plt, m4_plt, m5_plt, m6_plt, m7_plt, m8_plt,
-   m1_std, m2_std, m3_std, m4_std, m5_std, m6_std, m7_std, m8_std,
-   m1_std_clean, m2_std_clean, m3_std_clean, m4_std_clean, m5_std_clean, m6_std_clean, m7_std_clean, m8_std_clean, 
-   m1_plt_data, m2_plt_data, m3_plt_data, m4_plt_data, m5_plt_data, m6_plt_data, m7_plt_data, m8_plt_data)
-
-```
 
 # 4. Discussion
 
