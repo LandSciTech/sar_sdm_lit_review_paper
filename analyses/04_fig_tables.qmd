@@ -711,41 +711,81 @@ re_db <- sarsdm %>% filter (taxonomic_group != "Birds")
 -   The mean number of SDM-CC papers found per species in the literature review: `r mean(re_db$n_cc_sdm)`
 
 ```{r, echo = FALSE}
-#| tbl-cap: "Species and number of SDM and SDM-CC papers they were found to be included in. This table includes Bird species for reference, but likely isn't an accurate reflection of the number of papers these species are included in since we didn't complete a full literature review for this taxa. This table does not include species that were not included in any SDMs (n_sdm = 0)."
 dat_n_sdm <- sarsdm %>%
-  select(species, taxonomic_group, sara_status_adj, n_sdm, n_sdm_ca, n_cc_sdm, n_cc_sdm_ca, range_size_America) %>% 
-  #arrange(-(n_sdm)) %>%
-  arrange(-(n_sdm))%>%
-  unique() %>% 
-  mutate(range_size_America = replace_na(range_size_America, 0)) 
-  
+  select(species, taxonomic_group, sara_status_adj, n_sdm, n_sdm_ca, n_cc_sdm, 
+         n_cc_sdm_ca, range_size_America) %>%
+  # arrange(-(n_sdm)) %>%
+  arrange(-(n_sdm)) %>%
+  unique() %>%
+  mutate(range_size_America = replace_na(range_size_America, 0))
+
+dat_med_n_sdm <- dat_n_sdm %>%
+  summarise(
+    med_n_sdm = median(n_sdm), IQR_n_sdm = IQR(n_sdm),
+    q1 = quantile(n_sdm, probs = 0.25),
+    q2 = quantile(n_sdm, probs = 0.75),
+    .by = "taxonomic_group"
+  ) %>%
+  arrange(-med_n_sdm)
+
 lab_n_sdm <- dat_n_sdm %>% filter(n_sdm >= 9)
 
 jttr <- position_jitter(width = 0.2, height = 0, seed = 1234)
-  
-plt_n_sdm <- dat_n_sdm %>% 
-  ggplot(aes(n_sdm, range_size_America, col = taxonomic_group))+
-  geom_point(position = jttr)+
-  scale_x_continuous(breaks = 0:16, expand = expansion(add = c(0.5,5)))+
-  scale_y_sqrt(breaks = c(0, 10^(5:7), 2*10^7), 
-               expand = expansion(mult = c(0.025, 0.05)))+
-  scale_color_brewer(palette = "Paired")+
+
+plt_n_sdm <- dat_n_sdm %>%
+  ggplot(aes(n_sdm, range_size_America, col = taxonomic_group)) +
+  geom_point(position = jttr) +
+  scale_x_continuous(breaks = 0:16, expand = expansion(add = c(0.5, 5))) +
+  scale_y_sqrt(
+    breaks = c(0, 10^(5:7), 2 * 10^7),
+    expand = expansion(mult = c(0.025, 0.05))
+  ) +
+  scale_color_brewer(palette = "Paired") +
+  # scale_color_manual(values = cols4all::c4a("area9"))+
   # ggrepel::geom_text_repel(
   geom_text(
-  data = lab_n_sdm, 
-  aes(label = species, x = n_sdm+0.25), 
-  position = jttr,
-  show.legend = FALSE,
-  # min.segment.length = 0,
-  # direction = "y",
-  # box.padding = 0,
-  hjust = 0
-  )+
-  theme_classic()+
-  labs(x = "Number of papers", y = "Range size (square root transformed)", col = "Taxonmonic group")
-  
+    data = lab_n_sdm,
+    aes(label = species, x = n_sdm + 0.25),
+    col = "black",
+    position = jttr,
+    show.legend = FALSE,
+    # min.segment.length = 0,
+    # direction = "y",
+    # box.padding = 0,
+    hjust = 0
+  ) +
+  theme_classic() +
+  labs(
+    x = "Number of papers", y = "Range size (square root transformed)",
+    col = "Taxonomic group"
+  ) +
+  coord_cartesian(clip = "off")
+
+# point range to show median and IQR of n papers by taxonomic group
+# ggplot()+
+# geom_linerange(data = dat_med_n_sdm, aes(med_n_sdm, xmin = q1, xmax = q2,
+#                y = 2.7*1e7+1:9*1000000, col = taxonomic_group))+
+# geom_point(data = dat_med_n_sdm, aes(med_n_sdm,  
+#            y = 2.7*1e7+1:9*1000000, col = taxonomic_group))
+
+jpeg(file.path(path,"/figures/fig_n_sdm_papers.jpeg"), units="in", width=7.5, height=4, res=1000) 
 plt_n_sdm 
-  
+dev.off()
+
+# Number of species only included in Stolar et al by taxonomic group
+paper_db %>%
+  filter(sdm_na > 0) %>%
+  distinct(taxonomic_group, species, doc_citation, sdm_na) %>%
+  mutate(is_stolar = str_detect(doc_citation, "Stolar")) %>%
+  mutate(sdm_na_not_stolar = ifelse(is_stolar, 0, sdm_na)) %>%
+  group_by(taxonomic_group, species) %>%
+  summarise(n_sdm = sum(sdm_na), n_sdm_wo_stolar = sum(sdm_na_not_stolar)) %>%
+  group_by(taxonomic_group) %>%
+  summarise(n_sp_w_sdm = sum(n_sdm > 0), n_sp_w_sdm_wo_stolar = sum(n_sdm_wo_stolar > 0)) %>%
+  mutate(change_wo_stolar = n_sp_w_sdm - n_sp_w_sdm_wo_stolar) %>%
+  select(taxonomic_group, n_sp_w_sdm, change_wo_stolar) %>%
+  mutate(taxonomic_group = str_remove(taxonomic_group, "\\(terrestrial\\)")) %>%
+  kable()
 
 ```
 
@@ -916,7 +956,8 @@ fig_pnl_sdm_re <- re_na_sdm_bin %>%
   theme_classic() +
   #scale_fill_manual(values = c('#0c5c21','#379e4b','#93d289','#dff4da','grey'))+
   #scale_fill_manual(values=c('#0C3D8A','#367db7','#8dbddb','#d5e6f6','grey')) +
-  scale_fill_manual(values=c('#2f006a', '#553b92','#8d85be','#d0d1e5','grey')) +
+  scale_fill_manual(values=c(#'#2f006a', '#553b92','#8d85be','#d0d1e5','grey',
+                             "#4A1486", "#6A51A3", "#807DBA", "#9E9AC8", "grey")) +
   ylab("Proportion of species") +
   xlab(element_blank()) +
   labs(fill = "Number of papers") +
@@ -943,7 +984,8 @@ fig_pnl_cc_sdm_re <- re_na_cc_sdm_bin %>%
   geom_bar(position = "stack", stat = "identity") +
   geom_text(aes(taxonomic_group, 1.05, label = n_taxa, fill = NULL), size = 3, colour = '#36454F', data = sp_taxa_label_re) +
   theme_classic() +
-  scale_fill_manual(values = c('#0c5c21','#379e4b','#dff4da','grey')) +
+  scale_fill_manual(values = c(#'#0c5c21','#379e4b','#dff4da','grey',
+                               "#238B45", "#74C476", "#BAE4B3", "grey")) +
   #scale_fill_manual(values=c('#367db7','#8dbddb','#d5e6f6','grey'))+
   ylab("Proportion of species") +
   xlab(element_blank()) +
@@ -1025,9 +1067,9 @@ m1_plt <- m1_plt_data %>%
   geom_hline(yintercept = 0, col = "grey", size = 0.2)+
   geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
   geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
-  geom_point(shape = m1_plt_data$group, size = 4, stroke = 1.5)+ 
+  geom_point(shape = m1_plt_data$group, size = 3, stroke = 1.5)+ 
   scale_color_manual(values = c("black", "black"))+
-  ylim(-1.15, 2)+
+  ylim(-0.4, 1.6)+
   coord_flip()+
   #scale_x_discrete(labels = labs1)+
   labs(y = "Standardized effect (95% CI)", x = NULL) +
@@ -1081,9 +1123,9 @@ m2_plt <- m2_plt_data %>%
   geom_hline(yintercept = 0, col = "grey", size = 0.2)+
   geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
   geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
-  geom_point(shape = m2_plt_data$group, size = 4, stroke = 1.5)+ 
+  geom_point(shape = m2_plt_data$group, size = 3, stroke = 1.5)+ 
   scale_color_manual(values = c("black", "black"))+
-  ylim(-1.15, 2)+
+  ylim(-0.4, 1.6)+
   coord_flip()+
   #scale_x_discrete(labels = labs1)+
   labs(y = "Standardized effect (95% CI)", x = NULL)+
@@ -1136,9 +1178,9 @@ m7_plt <- m7_plt_data %>%
   geom_hline(yintercept = 0, col = "grey", size = 0.2)+
   geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
   geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
-  geom_point(shape = m7_plt_data$group, size = 4, stroke = 1.5)+ 
+  geom_point(shape = m7_plt_data$group, size = 3, stroke = 1.5)+ 
   scale_color_manual(values = c("black", "black"))+
-  ylim(-1.15, 2)+
+  ylim(-0.4, 0.75)+
   coord_flip()+
   #scale_x_discrete(labels = labs1)+
   labs(y = "Standardized effect (95% CI)", x = NULL)+
@@ -1191,9 +1233,9 @@ m8_plt <- m8_plt_data %>%
   geom_hline(yintercept = 0, col = "grey", size = 0.2)+
   geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
   geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
-  geom_point(shape = m8_plt_data$group, size = 4, stroke = 1.5)+ 
+  geom_point(shape = m8_plt_data$group, size = 3, stroke = 1.5)+ 
   scale_color_manual(values = c("black", "black"))+
-  ylim(-1.15, 2)+
+  ylim(-0.4, 0.75)+
   coord_flip()+
   #scale_x_discrete(labels = labs1)+
   labs(y = "Standardized effect (95% CI)", x = NULL)+
@@ -1203,23 +1245,30 @@ m8_plt <- m8_plt_data %>%
 
 # Plot figure #=================================================================
 
-cowplot::plot_grid(m1_plt, m2_plt, m7_plt, m8_plt, nrow = 2, labels = c('A', 'B', 'C', 'D'))
+# Set limits the same across plots
+# bind_rows(m8_plt_data, m7_plt_data, m1_plt_data, m2_plt_data) %>% 
+#   summarise(min = min(conf.low), max = max(conf.high))
+#          min      max
+# 1 -0.3919535 1.582384
+
+
+cowplot::plot_grid(m1_plt, m7_plt, m2_plt, m8_plt, nrow = 2, labels = c('A', 'B', 'C', 'D'))
 ```
 
 ```{r}
 #save figure
-jpeg(paste0(path,"/figures/fig_glm_results.jpeg"), units="in", width=10, height=8, res=1000)
-cowplot::plot_grid(m1_plt, m2_plt, m7_plt, m8_plt, nrow = 2, labels = c('A', 'B', 'C', 'D'))
+jpeg(paste0(path,"/figures/fig_glm_results.jpeg"), units="in", width=7.5, height=6, res=1000)
+cowplot::plot_grid(m1_plt, m7_plt, m2_plt, m8_plt, nrow = 2, labels = c('A', 'B', 'C', 'D'))
 dev.off()
 ```
 
 ```{r, echo = FALSE, warning = FALSE}
 
 # clean environment of all model data
-rm(m1_plt, m2_plt, m3_plt, m4_plt, m5_plt, m6_plt, m7_plt, m8_plt,
-   m1_std, m2_std, m3_std, m4_std, m5_std, m6_std, m7_std, m8_std,
-   m1_std_clean, m2_std_clean, m3_std_clean, m4_std_clean, m5_std_clean, m6_std_clean, m7_std_clean, m8_std_clean, 
-   m1_plt_data, m2_plt_data, m3_plt_data, m4_plt_data, m5_plt_data, m6_plt_data, m7_plt_data, m8_plt_data)
+# rm(m1_plt, m2_plt, m3_plt, m4_plt, m5_plt, m6_plt, m7_plt, m8_plt,
+#    m1_std, m2_std, m3_std, m4_std, m5_std, m6_std, m7_std, m8_std,
+#    m1_std_clean, m2_std_clean, m3_std_clean, m4_std_clean, m5_std_clean, m6_std_clean, m7_std_clean, m8_std_clean, 
+#    m1_plt_data, m2_plt_data, m3_plt_data, m4_plt_data, m5_plt_data, m6_plt_data, m7_plt_data, m8_plt_data)
 
 ```
 
@@ -1788,7 +1837,7 @@ fig_pnl_prop_doc_sdms_ld <- tbl_taxa_doc_sdm_comb_ld %>%
                                    "CC-SDM & SDM w/out CC"),
                         #labels = c("No SDMs", "CC-SDM", "SDM w/out CC", "Both types of SDMs")),
                         labels = c("No SDM", "SDM-No CC", "SDM-CC", 
-                                   "SDM-CC &\nSDM-No CC")),
+                                   "SDM-CC")),
 
                         #labels = c("No SDM", "SDM-CC", "SDM", "SDM-CC")),
          #label = str_wrap(label, width = 10),
@@ -1980,7 +2029,7 @@ fig_ldtype_doc_comb_sdm <- fig_ldtype_doc_sdm_comb_ld %>%
                         levels = c("No SDMs", "SDM w/out CC", "CC-SDM", 
                                    "CC-SDM & SDM w/out CC"),
                         #labels = c("No SDMs", "CC-SDM", "SDM w/out CC", "Both types of SDMs")),
-                        labels = c("No SDM", "SDM-No CC", "SDM-CC", "SDM-CC &\nSDM-No CC")),
+                        labels = c("No SDM", "SDM-No CC", "SDM-CC", "SDM-CC")),
          #label = str_wrap(label, width = 10),
          doc_type = factor(doc_type,
                            levels = c("COSEWIC Status Reports", "Recovery Strategies", "Management Plans"),
@@ -2055,7 +2104,7 @@ availability_vs_use <- function(availability, use) {
 # use availability_vs_use function above to determine availability of CC-SDMs
 
 use_v_avail <- sarsdm %>%
-  filter (taxonomic_group != "Birds") %>%
+  # filter (taxonomic_group != "Birds") %>%
   group_by(rowID) %>%
   mutate(avail_v_use_cc_sdm_threat = availability_vs_use(n_cc_sdm_ca_avl, X2_cc_sdm_cc_threat)) %>%
   ungroup()
@@ -2393,6 +2442,23 @@ merge(sp_model_taxa, only_Stolar, by = "taxonomic_group") %>%
   mutate(prop = round(n_sp/n_sp_taxa_sdm, digits = 2)) %>%
   select(taxonomic_group, n_sp, n_sp_taxa_sdm, prop) %>%
   kable()
+```
+
+
+```{r}
+# Multi species papers more common for Amphibians?
+dat_n_sp_paper <- paper_db %>% filter(sdm_na == 1) %>% 
+  group_by(paperID, doc_citation, taxonomic_group) %>% 
+  summarise(n_sp = n_distinct(speciesID), .groups = "drop") %>%
+  group_by(paperID) %>% 
+  mutate(tot_n_sp = sum(n_sp)) 
+
+dat_n_sp_paper %>% 
+  group_by(taxonomic_group) %>% 
+  summarise(mean_n_sp = mean(n_sp), n_1 = sum(n_sp == 1), n_gr_1 = sum(n_sp > 1)) %>% 
+  arrange(desc(mean_n_sp)) %>% 
+  mutate(pct_gr_1 = n_gr_1/(n_1 + n_gr_1))
+
 ```
 
 **Impact of excluding RSFs**
