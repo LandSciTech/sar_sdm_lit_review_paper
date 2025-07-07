@@ -1,7 +1,10 @@
 "","Taxonomic group","Num. sp in North American SDM","Num. sp in North American CC-SDM","Num. sp in Canada-inclusive SDM","Num. sp in Canada-inclusive CC-SDM","Sp not included in Canada-inclusive SDM","Sp not included in Canada-inclusive CC-SDM","Total sp in group"
-"1","Amphibians",20,16,20,16,0,0,20
-"2","Arthropods",11,1,10,1,1,0,50
+"1","Amphibians",20,19,20,19,0,0,20
+"2","Arthropods",22,12,21,12,1,0,50
 "3","Birds",60,54,56,52,4,2,83
-"4","Mammals (terrestrial)",21,17,21,17,0,0,31
-"5","Reptiles",20,17,19,17,1,0,30
-"6","Vascular Plants",29,14,24,5,5,9,178
+"4","Lichens",14,8,13,8,1,0,18
+"5","Mammals (terrestrial)",24,21,24,21,0,0,31
+"6","Molluscs",9,9,9,9,0,0,12
+"7","Mosses",12,12,12,12,0,0,16
+"8","Reptiles",20,18,20,18,0,0,30
+"9","Vascular Plants",73,58,68,50,5,8,178

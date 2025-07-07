@@ -1932,43 +1932,6 @@ avail_n_used %>% filter (CC_threat_CA == "0") %>%
 rm(use_v_avail, avail_n_used, not_avail_used, avail_used, availability_vs_use)
 ```
 
-**Availability of SDMs after listing document publication**
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of documents where a peer-reviewed Canada-inclusive SDM became available after development (new_sdm_avail: 1 = yes, 0 = no) and whether a SDM was used in the document (ld_sdm: 1 = yes, 0 = no). Excludes Birds."
-
-sarsdm %>%
-  filter (taxonomic_group != "Birds") %>%
-  group_by(rowID) %>%
-  mutate(new_sdm_avail = as.numeric (n_sdm_ca_new != 0)) %>%
-  ungroup() %>%
-  group_by(new_sdm_avail, ld_sdm) %>%
-  summarise(n_doc = n_distinct(rowID)) %>%
-  ungroup() %>%
-  filter (new_sdm_avail == "1") %>%
-  kable()
-
-```
-
-**Availability of SDM-CC after listing document publication**
-
-```{r, echo = FALSE}
-#| tbl-cap: "Number of documents where a new peer-reviewed Canada-inclusive CC-SDM became available after development (new_cc_sdm_avail: 1 = yes, 0 = no) and whether a CC-SDM (peer-reviewed or other) was used during the assessment of the threat of CC (X2_cc_sdm_cc_threat: 1 = yes, 0 or NA = no). Excludes Birds."
-
-# for documents that did not use a CC-SDM during the assessment of the threat of CC, have some become available
-sarsdm %>% 
-  filter (taxonomic_group != "Birds") %>%
-  #filter (X2_cc_sdm == "0") %>%
-  group_by (rowID) %>%
-  mutate(new_cc_sdm_avail = as.numeric(n_cc_sdm_ca_new != 0)) %>%
-  ungroup() %>%
-  group_by(new_cc_sdm_avail, X2_cc_sdm_cc_threat) %>%
-  summarise(n_doc = n_distinct(rowID)) %>% 
-  ungroup() %>%
-  filter (new_cc_sdm_avail == "1") %>%
-  kable()
-```
-
 
 # 4. Discussion
 
