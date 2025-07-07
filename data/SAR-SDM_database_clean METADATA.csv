@@ -1,0 +1,147 @@
+"CANSAR 1.0 refers to the database published in 2022. It is an open source and accessible dataset accessible at: https://osf.io/e4a58/
+Citation: Naujokaitis-Lewis, I., Endicott, S., & Guezen, J. M. (2022). CAN-SAR: A database of Canadian species at risk information. Scientific Data, 9(1), 289. https://doi.org/10.1038/s41597-022-01381-8
+
+SARSDM refers to data extracted during the SAR-SDM project. In the case of this database, that is the use of SDMs in listing documents.",For data taken from CANSAR: Note that 'NE' means Not Extracted throughout the database and indicates that the data has not been extracted but could be.,,,,,,,,,,
+column name,description,extraction details,source,format,possible values,,,,,,
+species,Binomial name of species,Scientific name directly transcribed from the document title.,CANSAR1.0,text,,,,,,,
+speciesID,Unique identifier for each species or designatable unit,There will be multiple entries for each species if there is more than one document published.,CANSAR1.0,Integer,,,,,,,
+common_name,Common name of species and population,Common name and population directly transcribed from the title page.,CANSAR1.0,text,,,,,,,
+taxonomic_group,Taxonomic group,The taxonomic group used in the document to describe the species.,CANSAR1.0,text,,,,,,,
+doc_type,The type of document. ,COSEWIC Status Reports includes Status Appraisal Summaries.,CANSAR1.0,Categorical,COSEWIC Status Reports, Recovery Strategies, Management Plans,,,,
+sara_status,The status of the species listed under SARA Schedule 1.,"The Schedule 1 status under SARA. It can be different from the status assessed by COSEWIC. It should be apparent from the 'Protection, status and rank section' of the executive summary in a Status Report, or the preface or executive summary of a Recovery Strategy or Management Plan. The species profile on the SAR Public Registry site also gives the status.",CANSAR1.0,Categorical,Endangered,Threatened,Special Concern,,,,
+date_of_listing,Date that the species was added to SARA Schedule 1.,Extracted from the SAR Public Registry Species Profile under Date added.,CANSAR1.0,YYYY-MM-DD,,,,,,,
+doc_citation,The citation for the document.,Directly transcribed from the 2nd page of the document.,CANSAR1.0,Text,,,,,,,
+url,URL for the SAR Public Registry website search page filtered to the species common name.,Constructed from the url for the SAR Public Registry species search page using the common name as a keyword.,CANSAR1.0,Text,,,,,,,
+year_published,The publication year of the document.,From the title page.,CANSAR1.0,YYYY,,,,,,,
+CC_threat_CA,Whether climate change is identified as a threat.,"If the threats calculator was included in the document, climate change was considered a threat if the 'Climate change and severe weather' threat class had an impact that was more than negligible or if climate change was described outside the threats calculator as a threat or potential threat.
+
+If a threats calculator is not completed it is considered identified as a threat if it is described in the threats and limiting factors section as having a negative or potentially negative impact on the species. 
+
+Note it is possible for the 'Climate change and severe weather' threat category to be identified as having an impact without climate change being identified, such as cases where natural storms, flooding or drought that are not related to climate change are a threat.",CANSAR1.0,Binary,0: No,1: Yes,,,,,
+seabird,Whether the species is a pelagic bird. ,"The IUCN species range map for bird species was examined. If the species has part of or all of their residency or breeding range at sea, they were categorized as a seabird. ",SARSDM,Binary,0: No,1: Yes,,,,,
+seabird_notes,"Notes pertaining to seabird field, as required.",Can include why the bird was classified as a seabird or not if unclear.,SARSDM,Text,,,,,,,
+migratory,Whether the species is migratory. ,"For non-bird species, if a species was present on the migratory species list presented by the Convention on the Conservation of Migratory Species of Wild Animals they were categorized as migratory. 
+
+For bird species, they were defined as migratory if they were listed as having two seasons by the National Audubon society.",SARSDM,Binary,0: No,1: Yes,NA: not checked,,,,
+subspecies,Indicator of whether the species in the CAN-SAR database a subspecies or variety,Based off of the species name,SARSDM,Binary,0: No,1: Yes,,,,,
+population,Indicator of whether the species listed in the CAN-SAR database belong to a specific population/designatable unit,Based off of the common_name,SARSDM,Binary,0: No,1: Yes,,,,,
+sdm,"Whether the species was included in at least one North American SDM paper, as found in the literature review. ","Added to database in R, based on information from the clean SAR-SDM paper database. Paper had to meet all of the following criteria:
+1) includes North America 
+2) not a RSF
+3) published before 2023  
+4) the paper is modelling the exact species listed as at risk, aka will be excluding papers that model parent species of species listed at the subspecies level",SARSDM,Binary,0: No,1: Yes,,,,,
+range_data,"Whether we were able to find range size data, or use spatial data to calculate range size for the species. This range data had to be for the exact species and included at minimum their North American range, ideally their North and South American range.","Determined after sourcing spatial/range data, and confirmed after validating spatial data reflects range of species.",SARSDM,Binary,0: No,1: Yes,,,,,
+rational_excluded,"If range_data = 0, reasoning why this species isn't being included","Determined after sourcing spatial/range data, and confirmed after validating spatial data reflects range of species.",SARSDM,Text,NA: range data available and used,,,,,,
+range_data_source,Short form description of the source of the data,Reflects the paper/source that the range size or spatial data came from.  ,SARSDM,Categorical,IUCN : range size was calculated based off of spatial data from IUCN,"Hardouin & Hargreaves : range size was provided in Hardouin, M. E., & Hargreaves, A. L. (2023). Mapping nationally and globally at-risk species to identify hotspots for (and gaps in) conservation. Proceedings of the Royal Society B: Biological Sciences, 290(1995).",EBAR : range size was calculated using spatial data provided by NatureServe's EBAR,status report + note on why data source was used: range size was provided in the status report,Stolar : spatial data was provided by Jessica Stolar in the form of SDM predictions,NA: no range size,
+range_data_citation,Citation for the data sources for range size,Reflects the paper/source that the range size or spatial data came from. Reflect the species specific citation for data whenever possible.,SARSDM,Text,NA: no range size data available,,,,,,
+spatial_data_used,Whether spatial data was used to calculate range size.,Based on the source of the range data.,SARSDM,Binary,0: No,1: Yes,NA: no range size data availble,,,,
+spatial_data_type,"For species with spatial_data_used = 1, a brief description of type of spatial data that was used to calculate range size (e.g., EOO, SDM output, range maps, etc). ",Based on the source of the range data.,SARSDM,Text,"NA: no range size data availble, or  no spatial data used",,,,,,
+spatial_data_data_accessed,"For species with spatial_data_used = 1, the date that the spatial data was accessed.",Recorded on day spatial data was downloaded. ,SARSDM,Month Day Year,"NA: no range size data availble, or  no spatial data used",,,,,,
+spatial_data_verified,Whether the spatial data has been plotted and verified against maps of the species distribution presented in the status report.,Recorded when spatial data was verified.,SARSDM,Binary,0: No,1: Yes,"NA: no range size data availble, or  no spatial data used",,,,
+range_size_Canada,"Range size in Canada, in kilometeres squared",Added to database in R after processing spatial data.,SARSDM,Numeric,,,,,,,
+range_size_America,"Range size in North and South America, in kilometeres squared",Added to database in R after processing spatial data.,SARSDM,Numeric,,,,,,,
+exclude_Hardouin_Hargreaves,Explanation to why the data from Hardouin & Hargreaves wasn't used,Recorded when examining notes in Hardouin & Hargreaves' data to determine whether the range size provided was appropriate to use.,SARSDM,Categorical,NA: Hardouin_Hargreaves = 0,N: data used,"U: range not mapped outside of Canada, was therefore not appropriate for our use","SDU: range data was calculated for separate designatable units, and was not appropriate for our use",,,
+cc_threat_ca_adj,,,SARSDM,Binary,0: No,1: Yes,,,,,
+sara_status_adj,"Adjusted SARA Status for each species to reflect the highest risk status for each species (based on 'species' field)
+
+This is the column used for SARA risk status in the regression models.",Added to database in R.,SARSDM,Categorical,,,,,,,
+year_of_listing,,,SARSDM,,,,,,,,
+min_year_of_listing,,,SARSDM,,,,,,,,
+cc_sdm,"Whether the species was included in at least one North American SDM-CC paper, as found in the literature review.
+
+Used as the response variable in SDM-CC inclusion model.","Added to database in R, based on information from the clean SAR-SDM paper database. Paper had to meet all of the following criteria:
+1) includes North America  
+2) not a RSF 
+3) published before 2023 
+4) the paper is modelling the exact species listed as at risk, aka will be excluding papers that model parent species of species listed at the subspecies level 
+5) includes a future projection 
+6) environmental predictors included climate",SARSDM,Binary,0: No,1: Yes,,,,,
+sdm_no_cc ,"Whether the species was included in at least one North American SDM-no CC paper, as found in the literature review.","Added to database in R, based on information from the clean SAR-SDM paper database. Paper had to meet all of the following criteria:
+1) includes North America  
+2) not a RSF 
+3) published before 2023 
+4) the paper is modelling the exact species listed as at risk, aka will be excluding papers that model parent species of species listed at the subspecies level 
+5) does not include climate change projections",SARSDM,Binary,0: No,1: Yes,,,,,
+sdm_ca,"Whether the species was included in at least one Canada-inclusive SDM paper, as found in the literature review.
+
+Used as the response variable in Canada-inclusive SDM inclusion model.","Added to database in R, based on information from the clean SAR-SDM paper database. Paper had to meet all of the following criteria:
+1) includes Canada  
+2) not a RSF 
+3) published before 2023 
+4) the paper is modelling the exact species listed as at risk, aka will be excluding papers that model parent species of species listed at the subspecies level ",SARSDM,Binary,0: No,1: Yes,,,,,
+cc_sdm_ca,"Whether the species was included in at least one Canada-inclusive SDM-CC paper, as found in the literature review.
+
+Used as the response variable in the Canada-inclusive SDM-CC inclusion model.","Added to database in R, based on information from the clean SAR-SDM paper database. Paper had to meet all of the following criteria:
+1) includes Canada  
+2) not a RSF 
+3) published before 2023 
+4) the paper is modelling the exact species listed as at risk, aka will be excluding papers that model parent species of species listed at the subspecies level 
+5) includes a future projection 
+6) environmental predictors included climate",SARSDM,Binary,0: No,1: Yes,,,,,
+sdm_no_cc_ca,"Whether the species was included in at least one Canada-inclusive SDM-no CC paper, as found in the literature review.","Added to database in R, based on information from the clean SAR-SDM paper database. Paper had to meet all of the following criteria:
+1) includes Canada  
+2) not a RSF 
+3) published before 2023 
+4) the paper is modelling the exact species listed as at risk, aka will be excluding papers that model parent species of species listed at the subspecies level 
+5) does not include climate change projections",SARSDM,Binary,0: No,1: Yes,,,,,
+n_sdm,"Number of SDM papers found in the literature review that include the species (i.e., research effort)
+
+Used as response variable for SDM research effort model","Added to database in R, based on informatio from the clean SAR-SDM paper database.",SARSDM,Integer,,,,,,,
+n_cc_sdm,"Number of SDM-CC papers found in the literature review that include the species (i.e., research effort)
+
+Used as response variable for SDM-CC research effort model","Added to database in R, based on informatio from the clean SAR-SDM paper database.",SARSDM,Integer,,,,,,,
+n_sdm_ca,"Number of Canada-inclusive SDM papers found in the literature review that include the species (i.e., research effort)
+
+Used as response variable for Canada-inclusive SDM research effort model","Added to database in R, based on informatio from the clean SAR-SDM paper database.",SARSDM,Integer,,,,,,,
+n_cc_sdm_ca,"Number of Canada-inclusive SDM-CC papers found in the literature review that include the species (i.e., research effort)
+
+Used as response variable for Canada-inclusive SDM-CC research effort model","Added to database in R, based on informatio from the clean SAR-SDM paper database.",SARSDM,Integer,,,,,,,
+rsf_sdm,"Whether the species was included in at least one Canada-inclusive SDM or RSF paper, as found in the literature review.","Added to database in R, based on information from the clean SAR-SDM paper database. Paper had to meet all of the following criteria:
+1) includes Canada  
+3) published before 2023 
+4) the paper is modelling the exact species listed as at risk, aka will be excluding papers that model parent species of species listed at the subspecies level ",SARSDM,Binary,0: No,1: Yes,,,,,
+n_rsf_sdm,"Number of SDM & RSF papers found in the literature review that include the species (i.e., research effort)","Added to database in R, based on informatio from the clean SAR-SDM paper database.",SARSDM,Integer,,,,,,,
+rowID,Unique identifier for each combination of speciesID and doc_citation,"There is one row per document.
+
+This is the rowID taken from CANSAR, and can be used to merge this data in. ",CANSAR1.0,Integer,,,,,,,
+X2_primary_review_date,Date that the recovery document or status report was reviewed by the primary reviewer for evidence of SDMs.,Recorded at time of review.,SARSDM,YYYY-MM-DD,NA: if document not reviewed (X2_target_group=EXC or 2_reviewed=NR),,,,,,
+X2_secondary_review_date,Date that the recovery document or status report was reviewed by the second reviewer for evidence of SDMs.,Recorded at time of review.,SARSDM,YYYY-MM-DD,"NA: document not reviewed (X2_target_group = EXC, X2_reviewed = NR, X2_review_assistance = N)",TBR: to be reviewed (e.g. X2_review_assistance = REV or X2_review_assistance = COMP). Waiting to be reviewed by a secondary reviewer.,,,,,
+X2_cc_sdm,"Whether a SDM was used to support the assessment of the threat of climate change to the species in any part of the document.  
+
+The part of the threats section that discusses climate change was examined in details. Keywords were used to search the rest of the document to determine whether an SDM supporting statements about climate change were present elsewhere in the document. ",Based on the presence or absence of a climate change SDM in the document used to inform the assessment of climate change to the species. ,SARSDM,Categorical,0: No,1: Yes,"U: unsure, needs to be reviewed by someone else",NA: if document not reviewed (X2_target_group=EXC or X2_reviewed=NR),,,
+X2_cc_sdm_ref_type,What type of reference the SDM referenced in the threats section of the report when discussing climate change is.,"Each SDM referenced was viewed in full to determine what type of reference it is.
+
+If there is more than one reference type, separate the categories by a space. ",SARSDM,Categorical,PR: peer-reviewed,"GL: grey literature (e.g., report, government document, working document, theses and dissertations)",NEW : a new SDM produced specifically for the document,UNP: unpublished data or manuscript or personal communications,"NRP: referenced SDM created outside of the recovery document, but no reference information provided to assess reference type",OTH: doesn't fit into any of the other categories,"NA: no SDM referenced (X2_cc_sdm = 0), or document not reviewed (X2_target_group=EXC or X2_reviewed=NR)"
+X2_cc_sdm_reference,Full citation of the SDM reference that supported the threat of climate change.,"Copied directly from the reference list in the document. 
+
+If there is more than one SDM referenced during the assessment of climate change as a threat the references will be separated by a space-surrounded semi-colon (i.e, [ref1] ; [ref2]). ",SARSDM,Text,"NRP: no reference provided, use this in caes where no reference information is provided for the SDM. Can include cases where unpublished data / manuscript was used and no reference is provided, or for personal communications","NA: no SDM referenced (X2_cc_sdm = 0), or document not reviewed (X2_target_group=EXC or X2_reviewed=NR)",,,,,
+X2_cc_sdm_section,The section of the report that X2_cc_sdm was found.,"Based on the context of the section that the CC-SDM was referenced in. 
+
+If more than one CC-SDM was referenced for other applications, separate the categories by a space.",SARSDM,Categorical,TH: assessing a non-climate change threat,CH: assessing critical habitat,"SI: describing species information (e.g., habitat availability, current distribution)","STR: discussed in strategies to meet objectives, or future objectives",OTH: doesn't fit into any of the other categories,"NA: no CC-SDM referenced (X2_cc_sdm = 0), or document not reviewed (X2_target_group=EXC or X2_reviewed=NR)",
+X2_cc_sdm_cc_threat,Whether the X2_cc_sdm was found in the section of the document that specifically assesses the threat of climate change ,"Based on the section of the recovery strategy or status assessmnet that the X2_cc_sdm was referenced in. If there is more than one CC-SDM found in the document, at least one of them needs to be included in the part that assesses the threat of climate change for this to be marked as yes. 
+
+Examples of sections that assess climate change: ""Threats and Limiting Factors > Climate Change"" or ""Threats > Description of Threats > Climate Change and Severe Weather"", including the threats calculator",SARSDM,Binary,0: no,1: yes,"NA: no CC-SDM referenced (X2_cc_sdm = 0), or document not reviewed (X2_target_group=EXC or X2_reviewed=NR)",,,,
+X2_cc_sdm_oth_threat,Whether the X2_cc_sdm was found in the section of tge documents that addresses a threat that is not climate change,"Based on the section of the recovery strategy or status assessmnet that the X2_cc_sdm was referenced in. If there is more than one CC-SDM found in the document, at least one of them needs to be included in the part that assesses a threat that is not climate change for this to be marked as yes. 
+
+Includes the threats calculator",SARSDM,Binary,0: no,1: yes,"NA: no CC-SDM referenced (X2_cc_sdm = 0), or document not reviewed (X2_target_group=EXC or X2_reviewed=NR)",,,,
+X2_other_sdm,"Whether an SDM was referenced in a section of the recovery document or status report, for other non-climate change related applications (e.g., critical habitat, estimation of species distribution or suitable habitat)
+
+A keyword search was completed on each document to detect SDMs referenced throughout the document. Does not take into account referenced to future plans or recommendations to model the species.",Based on the presence or absence of a SDM paper used for other non-climate change applications in the document. ,SARSDM,Categorical,0: No,1: Yes,"U: unsure, needs to be reviewed by someone else",NA: if document not reviewed (X2_target_group=EXC or X2_reviewed=NR),,,
+X2_other_sdm_reference,Full citation of the SDM reference used for other applications.,"Copied directly from the reference list in the document. 
+
+If there is more than one SDM referenced for other applications, the references will be separated by a space-surrounded semi-colon (i..e., [ref1] ; [ref2]). ",SARSDM,Text,"NRP: no reference provided.  Use this in caes where no reference information is provided for the SDM. Can include cases where unpublished data / manuscript was used and no reference is provided, or for personal communications","NA: no SDM referenced (X2_other_sdm = 0), or document not reviewed (X2_target_group=EXC or X2_reviewed=NR)",,,,,
+X2_other_sdm_section,The section of the report that X2_other_SDM was found.,"Based on the context of the section that the non-climate change SDM was referenced in. 
+
+If more than one SDM was referenced for other applications, separate the categories by a space.",SARSDM,Categorical,TH: assessing a non-climate change threat,CH: assessing critical habitat,"SI: describing species information (e.g., habitat availability, current distribution)","STR: discussed in strategies to meet objectives, or future objectives",OTH: doesn't fit into any of the other categories,"NA: no SDM referenced (X2_other_sdm = 0), or document not reviewed (X2_target_group=EXC or X2_reviewed=NR)",
+X2_other_sdm_cc_threat,Whether the X2_other_sdm was found in the section of the document that specifically assesses the threat of climate change ,"Based on the section of the recovery strategy or status assessmnet that the X2_other_sdm was referenced in. If there is more than one SDM found in the document, at least one of them needs to be included in the part that assesses the threat of climate change for this to be marked as yes. 
+
+Examples of sections that assess climate change: ""Threats and Limiting Factors > Climate Change"" or ""Threats > Description of Threats > Climate Change and Severe Weather"", including the threats calculator",SARSDM,Binary,0: no,1: yes,"NA: no non climate change SDM referenced (X2_other_sdm = 0), or document not reviewed (X2_target_group=EXC or X2_reviewed=NR)",,,,
+X2_other_sdm_oth_threat,Whether the X2_other_sdm was found in the section of the document that addresses a threat that is not climate change,"Based on the section of the recovery strategy or status assessmnet that the X2_other_sdm was referenced in. If there is more than one SDM- no CC found in the document, at least one of them needs to be included in the part that assesses a threat that is not climate change for this to be marked as yes. 
+
+Includes the threats calculator",SARSDM,Binary,0: no,1: yes,"NA: no non climate change SDM referenced (X2_cc_sdm = 0), or document not reviewed (X2_target_group=EXC or X2_reviewed=NR)",,,,
+X2_other_cc_model,"Whether another type of model that used climate change projections was present in the recovery document or status report, or a climate change SDM was present that models a species that it not the focal species (e.g., models a host species). These can include population models, habitat models (e.g., sea ice for polar bears), references to future global climate models (GCMs). ",Based on the text present in the status report or recovery document. ,SARSDM,Categorical,0: no other climate change model present in the document,"1: a different type of model present that models the focal species or another species (e.g., host plant)",2: data from a climate projection included,3: presence of models that fall under both 1 and 2 are present,NA: document not reviewed (X2_target_group=EXC or X2_reviewed=NR),,
+start_date,Refered to as listing document intiation date in manuscript. Reflects when the listing document started to be developed.,Added to database in R. Corresponds to publication year of listing document minus one year.,SARSDM,YYYY ,,,,,,,
+n_sdm_ca_avail,"Number of Canada-inclusive SDM papers available in the peer-reviewed literature, that include the species targeted in the listing document, at the time of listing document development. ",Added to database in R. Based on start_date and information on available papers from the clean SAR-SDM paper database,SARSDM,Integer,,,,,,,
+n_cc_sdm_ca_avail,"Number of Canada-inclusive SDM-CC papers available in the peer-reviewed literature, that include the species targeted in the listing document, at the time of listing document development. 
+
+Used in the availability vs use of SDM-CC analysis.",Added to database in R. Based on start_date and information on available papers from the clean SAR-SDM paper database,SARSDM,Integer,,,,,,,

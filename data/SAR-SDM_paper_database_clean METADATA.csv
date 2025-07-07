@@ -1,0 +1,143 @@
+"CANSAR 1.0 refers to the database published in 2022. It is an open source and accessible dataset accessible at: https://osf.io/e4a58/
+Citation: Naujokaitis-Lewis, I., Endicott, S., & Guezen, J. M. (2022). CAN-SAR: A database of Canadian species at risk information. Scientific Data, 9(1), 289. https://doi.org/10.1038/s41597-022-01381-8
+
+SARSDM refers to data extracted during the SAR-SDM project. In the case of this database, that is the use of SDMs in listing documents.","Note that each row represents a speciesID-paperID combination. These rows should be identical for the same species since we did not distinguish between populations when extracting data.
+
+For data taken from CANSAR: Note that 'NE' means Not Extracted throughout the database and indicates that the data has not been extracted but could be.",,,,,,,,,,,,,,,
+Field name,Description,Extraction details,Source,Format,Possible values,,,,,,,,,,,
+rowID,Unique identifier for each line in the database. Reflects each unique combination of speciesID and paperID for which data was extracted from papers.,"There is one rowID for each row in the database, created once all papers have been added to the database.
+
+This rowID is specific to this database, and is entirely different than the rowIDs used in CANSAR, SAR SDM database, and SR RD database.",SARSDM,Integer,,,,,,,,,,,,
+speciesID,Unique identifier for each species or designatable unit,There will be multiple entries for each species if there is more than one document published.,CANSAR1.0,Integer,,,,,,,,,,,,
+common_name,Common name of species and population,Common name and population directly transcribed from the title page.,CANSAR1.0,Text,,,,,,,,,,,,
+species,Binomial name of species,Scientific name directly transcribed from the document title.,CANSAR1.0,Text,,,,,,,,,,,,
+sara_status,The status of the species listed under SARA Schedule 1.,"The Schedule 1 status under SARA. It can be different from the status assessed by COSEWIC. It should be apparent from the 'Protection, status and rank section' of the executive summary in a Status Report, or the preface or executive summary of a Recovery Strategy or Management Plan. The species profile on the SAR Public Registry site also gives the status.",CANSAR1.0,Categorical,Endangered,Threatened,Special Concern,,,,,,,,,
+taxonomic_group,Taxonomic group,The taxonomic group used in the document to describe the species.,CANSAR1.0,Categorical,Amphibians, Arthropods, Birds, Fishes (freshwater), Fishes (marine), Lichens, Mammals (marine), Mammals (terrestrial), Molluscs, Mosses, Reptiles, Vascular Plants
+Class,Class.,Obtained from GBIF.,SARSDM,Text,NA: DFO species (DFO=1),,,,,,,,,,,
+Phylum,Phylum.,Obtained from GBIF.,SARSDM,Text,NA: DFO species (DFO=1),,,,,,,,,,,
+Order,Order.,Obtained from GBIF.,SARSDM,Text,NA: DFO species (DFO=1),,,,,,,,,,,
+Family,Family. ,Obtained from GBIF.,SARSDM,Text,NA: DFO species (DFO=1),,,,,,,,,,,
+DFO,Whether the species is listed under DFO jurisdiction.,List of species at risk under DFO jurisdiction found here: https://www.dfo-mpo.gc.ca/species-especes/sara-lep/identify-eng.html,SARSDN,Binary,1: yes,0: no,,,,,,,,,,
+population,Whether the species listed as at risk under SARA in the CAN-SAR database belong to a specific population/designatable unit,"Recorded for each species before data extraction from papers obtained during the literature review.  Based off of the ""common_name"" field, which is taken from CANSAR and reflects the species name on the title page of the recovery document. ",SARSDM,Binary,1: yes,0: no,NA: DFO species (DFO=1),,,,,,,,,
+subspecies,Whether the species in the species listed as at risk under SARA is a subspecies,"Recorded for each species before data extraction from papers obtained during the literature review. Based off of the ""species"" field, which is taken from CANSAR and reflects the scientific name on the title page of the recovery document. ",SARSDM,Binary,1: yes,0: no,NA: DFO species (DFO=1),,,,,,,,,
+paperID,Unique identifier for each paper obtained during the literature review. ,There is one ID per paper screened in during the literature review. There will be multiple entries with the same publicationID if there was more than one species modelled in the same publication.,SARSDM,Integer,,,,,,,,,,,,
+year_published,The publication year of the paper. ,From the title page of the paper obtained during the literature review. ,SARSDM,YYYY,,,,,,,,,,,,
+doc_citation,The citation for the paper. ,APA format. ,SARSDM,Text,,,,,,,,,,,,
+date_accessed,The date when the document was accessed on the Web of Science.,Recorded when the document was downloaded.,SARSDM,YYYY-MM-DD,,,,,,,,,,,,
+rsf,"Whether the paper is a resource selection function. These papers will be inclueded in the database, but no data past the paper information will be extracted from them. ","Based on the intro/methods of the paper. If the author indicates that they used a resource selection function (RSF) or habitat selection model, or if the response of the model is probability of use or probability of selection, this counted as a RSF.  ",SARSDM,Binary,1: yes,0: no,,,,,,,,,,
+North_America,"Indicator of whether all or part of North America and/or North American countries (Canada, United States, Mexico) are included in the spatial extent of the paper",As described in the methods of the paper.,SARSDM,Binary,1: yes,0: no,,,,,,,,,,
+subspecies_model,Indicator of whether the species modelled in the SDM corresponds to the exact species listed in the CAN-SAR database.,Based on the information in the paper obtained during the literature review. Determined using the species listed as being included in the paper or in the supplementary information,SARSDM,Categorical,"0: not a subspecies in CAN-SAR database, exact species modelled","1: subspecies in CAN-SAR database, exact subspecies modelled","2: subspecies in CAN-SAR database, parent species being modelled","3: parent species in CAN-SAR database, subspecies of that species being modelled","4: subspecies in CAN-SAR database, different subspecies of shared parent species being modelled",,,,,,,
+date_data_extraction,The date when the data from the paper was extracted. ,Recorded when data is extracted. ,SARSDM,YYYY-MM-DD,NE: data was not extracted from the paper,NA: paperID = 0,,,,,,,,,,
+rationale_ne,Rationale as to why data was not extracted from the paper.,"Recorded when inputting paper into database. If mutiple rationales apply, separate their codes by a comma.",SARSDM,Categorical,notNA: paper does not include North America,RSF: paper contains a RSF,2023 paper: paper was published in 2023,2024 paper: paper was published in 2024,DFO: the species is a DFO species,NA: data extracted from paper,,,,,,
+reviewer_initials,The initials of the person conducing the data extraction.,Recorded when data is extracted. ,SARSDM,Categorical,HK: Hannah Keefe,NE: data was not extracted from the paper ,NA: paperID = 0,,,,,,,,,
+pop_model_notes,"If the species in the row is listed as a specific population (population = 1), this will contain brief notes on whether it looks like all or part of the range of the specific population was included in the model(s). ","Determined based off the methods and spatial extent of the paper, cross referenced with a description of the spatial distribution of the DU/population which can be found in their status report. ",SARSDM,Text,NA: if the species is not a population (population = 0) or data not extracted (date_data_extracted = NE),,,,,,,,,,,
+motivation,"Why was the study conducted, main goals of the study, etc.",As described in the abstract and/or introduction of the paper. Copied directly from the paper. Sometimes paraphrased. ,SARSDM,Text,NA: data was not extracted from the paper (date_data_extracted = NE),,,,,,,,,,,
+built_sdm_historical,"Whether an SDM was built using historical occurrence records and historical climate/environmental data. Whether the SDM is historical is usually stated by the author, if it is not, any SDM with climate data before 1970 is considered historical.",As described in the methods.,SARSDM,Binary,1: yes,0: no,NA: data was not extracted from the paper (date_data_extracted = NE),,,,,,,,,
+historical_year,"Time period(s) of data used to build the historical model. Can enter separate data for occurrence data and climate data, if indiated as different.","As described in the methods. If more than one time period was modelled, include them all in a list. If different time periods were used for environmental and occurrence data, this can also be noted.",SARSDM,Text,NA: data was not extracted from the paper (date_data_extracted = NE) or no historical SDM built (built_sdm_historical=0),,,,,,,,,,,
+built_sdm_present,"An indicator of whether an SDM was built using present day occurrence and environmental data. Whether the SDM was built using current data is usually defined by the author, but if it is not, present SDMs are built using data between 1970-present",As described in the methods.,SARSDM,Binary,1: yes,0: no,NA: data was not extracted from the paper (date_data_extracted = NE),,,,,,,,,
+present_years,"Time period(s) of data used to build the present model. Can enter separate data for occurrence data and climate data, if indiated as different.","As described in the methods. If more than one time period was modelled, include them all in a list. If different time periods were used for environmental and occurrence data, this can also be noted.",SARSDM,Text,NA: data was not extracted from the paper (date_data_extracted = NE) or no present day SDM built (built_sdm_present=0),,,,,,,,,,,
+proj_future,Indicator of whether future climate projections or other environmental projection data were used in combination with a SDM to create future projections.,As described in the methods.,SARSDM,Binary,1: yes,0: no,NA: data was not extracted from the paper (date_data_extracted = NE),,,,,,,,,
+proj_future_year,Time period(s) of environmental/climate projections used in future projection,"As described in the methods. If there is more than one projection made, record them all. ",SARSDM,Text,NA: data was not extracted from the paper (date_data_extracted = NE) or no future projection done (proj_future=0),,,,,,,,,,,
+proj_present,"Indicator of whether a SDM built using data from a different time period (e.g., historical) was used to predict potential ranges of species in present day, OR a model built in a different paper was used to model distribution of the species in the present day (e.g., being applied to a different geographic scope)",As described in the methods.,SARSDM,Binary,1: yes,0: no,NA: data was not extracted from the paper (date_data_extracted = NE),,,,,,,,,
+proj_present_year,Time period of environmental data used in projection. ,As described in the methods.,SARSDM,Text,NA: data was not extracted from the paper (date_data_extracted = NE) or no future projection done (proj_present=0),,,,,,,,,,,
+proj_present_motive,Motivation of doing the projection. ,As described in the methods.,SARSDM,Text,NA: data was not extracted from the paper (date_data_extracted = NE) or no future projection done (proj_present=0),,,,,,,,,,,
+backcast,Indicator of whether a SDM was backcast to estimate historical or prehistoric distributions,As described in the methods.,SARSDM,Binary,1: yes,0: no,NA: data was not extracted from the paper (date_data_extracted = NE),,,,,,,,,
+back_year,The years that the model was backcast to.,As described in the methods.,SARSDM,Text,NA: data was not extracted from the paper (date_data_extracted = NE) or no future projection done (proj_present=0) or no backcast (backcast=0),,,,,,,,,,,
+predictors,"Categories of predictor data, describing whether they are solely climatic, or whether they include other environmental or biotic variables ","As described in the methods. If more than one category is applicable (e.g., they do more than one model), follow the following prioritisation level 1 > 2 > 3",SARSDM,Categorical,1: just climate,"2: climate + other (e.g., land use, biotic, soil or vegetation, others)","3: no climate, other only (e.g., land use, biotic, soil, vegetation)",NA: data was not extracted from the paper (date_data_extracted = NE),,,,,,,,
+num_species,The total number of species modelled in the paper. Includes Canadian SAR and other species. ,As described in the methods.,SARSDM,Integer,NA: data was not extracted from the paper (date_data_extracted = NE),,,,,,,,,,,
+extent_region,"Notes on the spatial / geographic extent of the paper by states, provinces, countries or continents.",As described in the methods.,SARSDM,Text,NA: data was not extracted from the paper (date_data_extracted = NE),,,,,,,,,,,
+region_notes,"Additional details about the study extent, if present.",As described in the methods.,SARSDM,Text,NA: data was not extracted from the paper (date_data_extracted = NE),,,,,,,,,,,
+spatial_limits,"Information pertaining to what delimits the boundaries of the spatial extent of the data used to build the SDM (NOT the spatial extent of the data presented). See more detailed descriptions of each category in the technical methods.
+
+Added to data extraction in Dec 2023.","Only extracted from papers included in the analysis.
+As described in methods, figures, or supplementary information",SARSDM,Categorical,1: data from the species' full range used to build the SDM,"2: data from the species' partial range used to build the model, spatial limits of sampled data defined by national borders","3: data from the species' partial range used to build the model, spatial limits of sampled data defined by provincial, state or territorial borders","4: data from the species' partial range used to build the model, spatial limits of sampled data defined by other borders/limits/boundaries (e.g., parks, ecozone, counties, other)","0: unclear, author does not clearly state what species data was used to build the SDM",NA: data was not extracted from the paper (date_data_extracted = NE) or paper was not included in analysis (inc_analysis = 0),,,,,,
+notes_spatial_limits,"Additional notes pertaining to the spatial_limits field, if data extractor thinks an explanation of why the category was chosen.
+
+Added to data extraction in Dec 2023.","Only extracted from papers included in the analysis.
+
+As needed by person extracting data. Details can be copied directly from the paper.",SARSDM,Text,NA: data was not extracted from the paper (date_data_extracted = NE) or paper was not included in analysis (inc_analysis = 0),,,,,,,,,,,
+built_CA,"Whether data from all or part of the species' range in Canada was included in building the SDM. 
+
+Added to data extraction in Dec 2023.","Only extracted from papers included in the analysis and if spatial_limits doesn't equal 1 (full range).
+
+If spatial_limits = 0 (unclear) can still fill out this field if there are some details on which countries are included in the spatial extent. 
+
+As described in the methods.",SARSDM,Categorical,1: yes,0: no,unclear: unclear based on details provided in paper,"NA: data was not extracted from the paper (date_data_extracted = NE), paper was not included in analysis (inc_analysis = 0) or full range modelled (spatial_limits = 1)",,,,,,,,
+built_US,"Whether data from all or part of the species' range in the United States was included in building the SDM. 
+
+Added to data extraction in Dec 2023.","Only extracted from papers included in the analysis and if spatial_limits doesn't equal 1 (full range).
+
+If spatial_limits = 0 (unclear) can still fill out this field if there are some details on which countries are included in the spatial extent. 
+
+As described in the methods.",SARSDM,Categorical,1: yes,0: no,unclear: unclear based on details provided in paper,"NA: data was not extracted from the paper (date_data_extracted = NE), paper was not included in analysis (inc_analysis = 0) or full range modelled (spatial_limits = 1)",,,,,,,,
+built_MX,"Whether data from all or part of the species' range in the Mexico was included in building the SDM. 
+
+Added to data extraction in Dec 2023.","Only extracted from papers included in the analysis and if spatial_limits doesn't equal 1 (full range).
+
+If spatial_limits = 0 (unclear) can still fill out this field if there are some details on which countries are included in the spatial extent. 
+
+As described in the methods.",SARSDM,Categorical,1: yes,0: no,unclear: unclear based on details provided in paper,"NA: data was not extracted from the paper (date_data_extracted = NE), paper was not included in analysis (inc_analysis = 0) or full range modelled (spatial_limits = 1)",,,,,,,,
+focus_CA,Was the study objectives focused on the Canadian portion of the range. Can be different from built_X fields in situations where ,"Only extracted from papers included in the analysis. 
+
+As described in the intro, methods, or presented in the results.",SARSDM,Categorical,1: yes,0: no,unclear: unclear based on details provided in paper,"NA: data not extracted because full range modelled (spatial_limits=1), spatial limits of model are unclear (spatial_limits =0). No climate change SDM in paper (proj_future=0) or data extracted from the paper (DFO=1, rsf=1, North_America =0).",,,,,,,,
+focus_US,Was the study objectives focused on the portion of the range in the United States,"Only extracted from papers included in the analysis. 
+
+As described in the intro, methods, or presented in the results.",SARSDM,Categorical,1: yes,0: no,unclear: unclear based on details provided in paper,"NA: data not extracted because full range modelled (spatial_limits=1), spatial limits of model are unclear (spatial_limits =0). No climate change SDM in paper (proj_future=0) or data extracted from the paper (DFO=1, rsf=1, North_America =0).",,,,,,,,
+focus_MX,Was the study objectives focused on the Mexican portion of the range,"Only extracted from papers included in the analysis 
+
+As described in the intro, methods, or presented in the results.",SARSDM,Categorical,1: yes,0: no,unclear: unclear based on details provided in paper,"NA: data not extracted because full range modelled (spatial_limits=1), spatial limits of model are unclear (spatial_limits =0). No climate change SDM in paper (proj_future=0) or data extracted from the paper (DFO=1, rsf=1, North_America =0).",,,,,,,,
+obj_cc_vulnerability,"Only extracted from CC-SDMs (have to include a future projection (proj_future = 1), and climate predictors (predictors = 1 or 2).
+
+Is the objective of the CC-SDM focused on assessing the CC vulnerability/exposure/risk of the species (i.e., impact of climate change on the range of the species, create maps of potential future suitable habitat/distribution, assessing changes in distribution/range size, identifying when and where a species/population is most vulnerable to CC).
+
+Added to data extraction in Dec 2023. ",As described in the intro/abstract of the paper,SARSDM,Binary,1: yes,0: no,"NA: data not extracted because no climate change SDM in paper (proj_future=0) or no data extracted from the paper (DFO=1, rsf=1, North_America =0).",,,,,,,,,
+obj_conservation,"Only extracted from CC-SDMs (have to include a future projection (proj_future = 1), and climate predictors (predictors = 1 or 2).
+
+Is the objective of the CC-SDM focused on management and conservation (e.g. identify refugia, assessing which areas should be priorities for protection, assessing changes to risk status based on estimates of future ranges)
+
+Added to the data extraction in Dec 2023.",As described in the intro/abstract of the paper,SARSDM,Binary,1: yes,0: no,"NA: data not extracted because no climate change SDM in paper (proj_future=0) or no data extracted from the paper (DFO=1, rsf=1, North_America =0).",,,,,,,,,
+obj_method,"Only extracted from CC-SDMs (have to include a future projection (proj_future = 1), and climate predictors (predictors = 1 or 2).
+
+Is the objective of the CC-SDM focused on developing or testing methodology (e.g., compare and contrast model outputs using different data, modelling methods, climate data, spatial and temporal scales).
+
+Added to data extraction in Dec 2023. ",As described in the intro/abstract of the paper,SARSDM,Binary,1: yes,0: no,"NA: data not extracted because no climate change SDM in paper (proj_future=0) or no data extracted from the paper (DFO=1, rsf=1, North_America =0).",,,,,,,,,
+obj_other,"Only extracted from CC-SDMs (have to include a future projection (proj_future = 1), and climate predictors (predictors = 1 or 2).
+
+The objective of the CC-SDM does not fit into any of the above categories (e.g., public health, invasive species, commercial activities, genetic/molecular questions).
+
+Added to data extraction in Dec 2023.",As described in the intro/abstract of the paper,SARSDM,Binary,1: yes,0: no,"NA: data not extracted because no climate change SDM in paper (proj_future=0) or no data extracted from the paper (DFO=1, rsf=1, North_America =0).",,,,,,,,,
+obj_text,"Only extracted from CC-SDMs (have to include a future projection (proj_future = 1), and climate predictors (predictors = 1 or 2).
+
+Text from the paper describing the objectives of projecting the SDM into the future using climate change projection models.
+
+Added to data extraction in May 2024.",Copied directly from the paper where describing the objectives of the CC-SDM. ,SARSDM,Text,"NA: data not extracted because no climate change SDM in paper (proj_future=0) or no data extracted from the paper (DFO=1, rsf=1, North_America =0).",,,,,,,,,,,
+secondary_model,"Whether the paper in the row did not build an SDM/RSF, but rather used one built previously in the literature or elsewhere (i.e., they are not the primary source of the model). Details on whose model was used can be found in the notes field. ",As described in the methods of the paper,SARSDM,Categorical,NA: data not extracted from paper,"0: no, paper is the primary source of the SDM","1: yes, paper used a previously built SDM",,,,,,,,,
+sdm_na,Whether the paperID/speciesID combiation meets all of the criteria to be a North American SDM (as included in our analyses),"PaperID/speciesID combination needs to meet the following criteria:
+1) includes North America (North_America = 1), 
+2) not a RSF (rsf = 0), 
+3) published before 2023 (year_published < 2023), 
+4) the paper is modelling the exact species listed as at risk, aka will be excluding papers that model parent species of species listed at the subspecies level (subspecies_model = 0 or 1)
+",SARSDM,Binary,0 : no,1: yes,,,,,,,,,,
+cc_sdm_na,Whether the paperID/speciesID combiation meets all of the criteria to be a North American SDM-CC (as included in our analyses),"PaperID/speciesID combinatio needs to meet the following criteria:
+1) sdm_na = 1 (meets criteria to be a SDM included in analysis)
+2) proj_future = 1 (future projection)
+3) predictors = 1 or 2 (i.e., include climate)",SARSDM,Binary,0 : no,1: yes,,,,,,,,,,
+sdm_no_cc_na,Whether the paperID/speciesID combiation meets all of the criteria to be a North American SDM-no CC (as included in our analyses),"PaperID/speciesID combinatio needs to meet the following criteria:
+1) sdm_na = 1 (meets criteria to be a SDM included in analysis)
+2) cc_sdm_na = 0 (not a SDM-CC)",SARSDM,Binary,0 : no,1: yes,,,,,,,,,,
+sdm_ca,Whether the paperID/speciesID combiation meets all of the criteria to be a Canada-inclusive SDM (as included in our analyses),"PaperID/speciesID combination needs to meet the following criteria:
+1) sdm_na = 1
+2) spatial_limit = 1 (full range) OR (built_CA = 1)
+",SARSDM,Binary,0 : no,1: yes,,,,,,,,,,
+cc_sdm_ca,Whether the paperID/speciesID combiation meets all of the criteria to be a Canada-inclusive SDM-CC (as included in our analyses),"PaperID/speciesID combinatio needs to meet the following criteria:
+1) sdm_ca = 1 (meets criteria to be a SDM included in analysis)
+2) proj_future = 1 (future projection)
+3) predictors = 1 or 2 (i.e., include climate)",SARSDM,Binary,0 : no,1: yes,,,,,,,,,,
+sdm_no_cc_ca,Whether the paperID/speciesID combiation meets all of the criteria to be a Canada-inclusive SDM-no CC (as included in our analyses),"PaperID/speciesID combinatio needs to meet the following criteria:
+1) sdm_ca = 1 (meets criteria to be a SDM included in analysis)
+2) cc_sdm_ca = 0 (not a SDM-CC)",SARSDM,Binary,0 : no,1: yes,,,,,,,,,,
+rsf_sdm_na,Whether the paperID/speciesID combination meets all criteria to be a North American SDM or RSF paper.,"PaperID/speciesID combination needs to meet the following criteria:
+1) includes North America (North_America = 1), 
+2) published before 2023 (year_published < 2023), 
+3) the paper is modelling the exact species listed as at risk, aka will be excluding papers that model parent species of species listed at the subspecies level (subspecies_model = 0 or 1)
+",SARSDM,Binary,0 : no,1: yes,,,,,,,,,,
