@@ -598,6 +598,11 @@ fig_lit_review
 jpeg(paste0(path,"/figures/fig_lit_review_results.jpeg"), units="in", width=4, height=7, res=1000)
 fig_lit_review
 dev.off()
+
+#save for submission
+pdf(paste0(path,"/figures/fig_lit_review_results.pdf"), width=4, height=7)
+fig_lit_review
+dev.off()
 ```
 
 **Research effort stats**
@@ -660,6 +665,10 @@ plt_n_sdm <- dat_n_sdm %>%
 
 
 jpeg(file.path(path,"/figures/fig_n_sdm_papers.jpeg"), units="in", width=7.5, height=4, res=1000) 
+plt_n_sdm 
+dev.off()
+
+pdf(file.path(path,"/figures/fig_n_sdm_papers.pdf"), width=7.086, height=4) 
 plt_n_sdm 
 dev.off()
 
@@ -861,6 +870,13 @@ plot_grid(fig_pnl_sdm_re, fig_pnl_cc_sdm_re,
 ```{r}
 #save figure
 jpeg(paste0(path,"/figures/fig_research_effort.jpeg"), units="in", width=6, height=4, res=1000)
+plot_grid(fig_pnl_sdm_re, fig_pnl_cc_sdm_re,
+          nrow = 2,
+          labels = "AUTO")
+dev.off()
+
+#save figure for submission
+pdf(paste0(path,"/figures/fig_research_effort.pdf"), width=6, height=4)
 plot_grid(fig_pnl_sdm_re, fig_pnl_cc_sdm_re,
           nrow = 2,
           labels = "AUTO")
@@ -1114,6 +1130,11 @@ cowplot::plot_grid(m1_plt, m7_plt, m2_plt, m8_plt, nrow = 2, labels = c('A', 'B'
 jpeg(paste0(path,"/figures/fig_glm_results.jpeg"), units="in", width=7.5, height=6, res=1000)
 cowplot::plot_grid(m1_plt, m7_plt, m2_plt, m8_plt, nrow = 2, labels = c('A', 'B', 'C', 'D'))
 dev.off()
+
+pdf(paste0(path,"/figures/fig_glm_results.pdf"), width=7.086, height=6)
+cowplot::plot_grid(m1_plt, m7_plt, m2_plt, m8_plt, nrow = 2, labels = c('A', 'B', 'C', 'D'))
+dev.off()
+
 ```
 
 
@@ -1830,6 +1851,10 @@ fig_ld_stats
 ```{r}
 # save figure V2
 jpeg(paste0(path,"/figures/fig_ld_stats.jpeg"), units="in", width=5, height=8, res=1000)
+fig_ld_stats
+dev.off()
+
+pdf(paste0(path,"/figures/fig_ld_stats.pdf"), width=5, height=8)
 fig_ld_stats
 dev.off()
 ```
