@@ -37,6 +37,8 @@ sarsdm <- read.csv(paste0(path,"/data/SAR-SDM_database_clean.csv"))
 sarsdm <- sarsdm %>%
   # remove species without range data, and Extirpated species
   filter (range_data == "1", sara_status_adj != "Extirpated") %>%
+  # remove mosses because no sdms so can't model
+  filter(taxonomic_group != "Mosses") %>%
   # convert binary response variables into factors
   mutate(year = min_year_of_listing,
          sdm = factor(sdm),
@@ -47,11 +49,11 @@ sarsdm <- sarsdm %>%
   mutate(taxonomic_group = factor(taxonomic_group,
                                   levels = c("Amphibians", "Arthropods",
                                              "Birds","Lichens","Mammals (terrestrial)",
-                                             "Molluscs","Mosses","Reptiles",
+                                             "Molluscs","Reptiles",
                                              "Vascular Plants"),
                                   labels = c("Amphibians", "Arthropods",
                                              "Birds","Lichens","Mammals",
-                                             "Molluscs","Mosses","Reptiles",
+                                             "Molluscs","Reptiles",
                                              "VascularPlants")),
          taxonomic_group = relevel(taxonomic_group, ref="Arthropods"),
          sara_status_adj = factor(sara_status_adj,
@@ -96,7 +98,7 @@ m1_supp_db_std <- model.matrix(sdm ~ taxonomic_group + log_range_am + sara_statu
 
 # create version of database with cleaned up column names
 m1_supp_db_std_clean <- m1_supp_db_std
-colnames(m1_supp_db_std_clean) <- c("Intercept","Birds","Lichens","Mammals","Molluscs","Mosses","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","sdm")
+colnames(m1_supp_db_std_clean) <- c("Intercept","Birds","Lichens","Mammals","Molluscs","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","sdm")
 
 m1_supp_db <- m1_supp_db %>%
   mutate(log_range_std = log_range_am - mean(log_range_am),
@@ -110,7 +112,6 @@ m1_supp_std <- glm (sdm ~
                  taxonomic_groupLichens +
                  taxonomic_groupMammals +
                  taxonomic_groupMolluscs +
-                 taxonomic_groupMosses +
                  taxonomic_groupReptiles +
                  taxonomic_groupVascularPlants +
                  sara_status_adjThreatened + 
@@ -121,7 +122,7 @@ m1_supp_std <- glm (sdm ~
                data = m1_supp_db_std)
 
 # for saving model summary
-m1_supp_std_clean <- glm (sdm ~ Birds + Lichens + Mammals +Molluscs + Mosses + Reptiles +
+m1_supp_std_clean <- glm (sdm ~ Birds + Lichens + Mammals +Molluscs + Reptiles +
                        VascularPlants + Threatened + Endangered + Rangesize + Year,
                      family = binomial,
                      data = m1_supp_db_std_clean)
@@ -182,7 +183,7 @@ m2_supp_db_std <- model.matrix(cc_sdm ~ taxonomic_group + sqrt_range_am + sara_s
   rename()
 
 m2_supp_db_std_clean <- m2_supp_db_std
-colnames(m2_supp_db_std_clean) <- c("Intercept","Amphibians","Birds","Lichens","Mammals","Molluscs","Mosses","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","CCThreat","cc_sdm")
+colnames(m2_supp_db_std_clean) <- c("Intercept","Amphibians","Birds","Lichens","Mammals","Molluscs","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","CCThreat","cc_sdm")
 
 m2_supp_db <- m2_supp_db %>%
   mutate(sqrt_range_std = sqrt_range_am - mean(sqrt_range_am),
@@ -197,7 +198,6 @@ m2_supp_std <- glm (cc_sdm ~
                  taxonomic_groupLichens +
                  taxonomic_groupMammals +
                  taxonomic_groupMolluscs +
-                 taxonomic_groupMosses +
                  taxonomic_groupReptiles +
                  taxonomic_groupVascularPlants +
                  sara_status_adjThreatened + 
@@ -209,8 +209,8 @@ m2_supp_std <- glm (cc_sdm ~
                data = m2_supp_db_std)
 
 # for printing summary
-m2_supp_std_clean <- glm (cc_sdm ~ Amphibians + Birds + Lichens + Mammals + Molluscs +
-                       Mosses + Reptiles + VascularPlants + Threatened + Endangered +
+m2_supp_std_clean <- glm (cc_sdm ~ Amphibians + Birds + Lichens + Mammals + Molluscs + 
+                            Reptiles + VascularPlants + Threatened + Endangered +
                        Rangesize + Year + CCThreat,
                      family = binomial,
                      data = m2_supp_db_std_clean)
@@ -274,7 +274,7 @@ m3_supp_db_std <- model.matrix(sdm_ca ~ taxonomic_group + log_range_am + sara_st
   rename()
 
 m3_supp_db_std_clean <- m3_supp_db_std
-colnames(m3_supp_db_std_clean) <- c("Intercept","Birds","Lichens","Mammals","Molluscs","Mosses","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","sdm_ca")
+colnames(m3_supp_db_std_clean) <- c("Intercept","Birds","Lichens","Mammals","Molluscs","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","sdm_ca")
 
 m3_supp_db <- m3_supp_db %>%
   mutate(log_range_std = log_range_am - mean(log_range_am),
@@ -288,7 +288,6 @@ m3_supp_std <- glm (sdm_ca ~
                  taxonomic_groupLichens +
                  taxonomic_groupMammals +
                  taxonomic_groupMolluscs +
-                 taxonomic_groupMosses +
                  taxonomic_groupReptiles +
                  taxonomic_groupVascularPlants +
                  sara_status_adjThreatened + 
@@ -299,7 +298,7 @@ m3_supp_std <- glm (sdm_ca ~
                data = m3_supp_db_std)
 
 # for saving model summary
-m3_supp_std_clean <- glm (sdm_ca ~ Birds +Lichens + Mammals + Molluscs +Mosses +Reptiles +
+m3_supp_std_clean <- glm (sdm_ca ~ Birds +Lichens + Mammals + Molluscs +Reptiles +
                        VascularPlants +Threatened +  Endangered +Rangesize +Year,
                      family = binomial,
                      data = m3_supp_db_std_clean)
@@ -365,7 +364,7 @@ m4_supp_db_std <- model.matrix(cc_sdm_ca ~ taxonomic_group + log_range_am + sara
   rename()
 
 m4_supp_db_std_clean <- m4_supp_db_std
-colnames(m4_supp_db_std_clean) <- c("Intercept","Amphibians","Birds","Lichens","Mammals","Molluscs","Mosses","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","CCThreat","cc_sdm_ca")
+colnames(m4_supp_db_std_clean) <- c("Intercept","Amphibians","Birds","Lichens","Mammals","Molluscs","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","CCThreat","cc_sdm_ca")
 
 ## Build model ##===============================================================
 
@@ -376,7 +375,6 @@ m4_supp_std <- glm (cc_sdm_ca ~
                  taxonomic_groupLichens +
                  taxonomic_groupMammals +
                  taxonomic_groupMolluscs +
-                 taxonomic_groupMosses +
                  taxonomic_groupReptiles +
                  taxonomic_groupVascularPlants +
                  sara_status_adjThreatened + 
@@ -389,7 +387,7 @@ m4_supp_std <- glm (cc_sdm_ca ~
 
 # for saving model estimates
 m4_supp_std_clean <- glm (cc_sdm_ca ~ Amphibians + Birds +Lichens +Mammals + Molluscs +
-                       Mosses +Reptiles +VascularPlants +Threatened + Endangered +
+                       Reptiles +VascularPlants +Threatened + Endangered +
                        Rangesize +CCThreat +Year,
                      family = binomial,
                      data = m4_supp_db_std_clean)
@@ -456,7 +454,7 @@ m5_supp_db_std <- model.matrix(n_sdm_ca ~ taxonomic_group + log_range_am + sara_
   rename()
 
 m5_supp_db_std_clean <- m5_supp_db_std
-colnames(m5_supp_db_std_clean) <- c("Intercept","Amphibians","Lichens","Mammals","Molluscs","Mosses","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","n_sdm_ca")
+colnames(m5_supp_db_std_clean) <- c("Intercept","Amphibians","Lichens","Mammals","Molluscs","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","n_sdm_ca")
 
 ## Build model ##===============================================================
 
@@ -466,7 +464,6 @@ m5_supp_std <- glm (n_sdm_ca ~
                  taxonomic_groupLichens +
                  taxonomic_groupMammals +
                  taxonomic_groupMolluscs +
-                 taxonomic_groupMosses +
                  taxonomic_groupReptiles +
                  taxonomic_groupVascularPlants +
                  sara_status_adjThreatened + 
@@ -477,7 +474,7 @@ m5_supp_std <- glm (n_sdm_ca ~
                data = m5_supp_db_std)
 
 # for saving model estimates
-m5_supp_std_clean <- glm (n_sdm_ca ~  Amphibians +Lichens + Mammals +Molluscs +Mosses +
+m5_supp_std_clean <- glm (n_sdm_ca ~  Amphibians +Lichens + Mammals +Molluscs +
                        Reptiles +VascularPlants +Threatened + Endangered + Rangesize +
                        Year,
                      family = poisson,
@@ -556,7 +553,7 @@ m6_supp_db_std <- model.matrix(n_cc_sdm_ca ~ taxonomic_group + log_range_am + sa
   rename()
 
 m6_supp_db_std_clean <- m6_supp_db_std
-colnames(m6_supp_db_std_clean) <- c("Intercept","Amphibians","Lichens","Mammals","Molluscs","Mosses","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","CCThreat","n_cc_sdm_ca")
+colnames(m6_supp_db_std_clean) <- c("Intercept","Amphibians","Lichens","Mammals","Molluscs","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","CCThreat","n_cc_sdm_ca")
 
 ## Build model ##===============================================================
 
@@ -566,7 +563,6 @@ m6_supp_std <- glm (n_cc_sdm_ca ~
                  taxonomic_groupLichens +
                  taxonomic_groupMammals +
                  taxonomic_groupMolluscs +
-                 taxonomic_groupMosses +
                  taxonomic_groupReptiles +
                  taxonomic_groupVascularPlants +
                  sara_status_adjThreatened + 
@@ -579,7 +575,7 @@ m6_supp_std <- glm (n_cc_sdm_ca ~
 
 # for saving model estimates
 m6_supp_std_clean <- glm (n_cc_sdm_ca ~ Amphibians +Lichens +Mammals + Molluscs +
-                       Mosses + Reptiles +VascularPlants +Threatened + Endangered +
+                        Reptiles +VascularPlants +Threatened + Endangered +
                        Rangesize +Year +CCThreat,
                      family = poisson,
                      data = m6_supp_db_std_clean)
@@ -661,7 +657,7 @@ m7_supp_db_std <- model.matrix(n_sdm ~ taxonomic_group + log_range_am + sara_sta
 
 
 m7_supp_db_std_clean <- m7_supp_db_std
-colnames(m7_supp_db_std_clean) <- c("Intercept","Amphibians","Lichens","Mammals","Molluscs","Mosses","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","n_sdm")
+colnames(m7_supp_db_std_clean) <- c("Intercept","Amphibians","Lichens","Mammals","Molluscs","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","n_sdm")
 
 ## Build model ##===============================================================
 
@@ -671,7 +667,6 @@ m7_supp_std <- glm (n_sdm ~
                  taxonomic_groupLichens +
                  taxonomic_groupMammals +
                  taxonomic_groupMolluscs +
-                 taxonomic_groupMosses +
                  taxonomic_groupReptiles +
                  taxonomic_groupVascularPlants +
                  sara_status_adjThreatened + 
@@ -682,7 +677,7 @@ m7_supp_std <- glm (n_sdm ~
                data = m7_supp_db_std)
 
 # for saving model summary
-m7_supp_std_clean <- glm (n_sdm ~Amphibians +Lichens + Mammals +Molluscs +Mosses +
+m7_supp_std_clean <- glm (n_sdm ~Amphibians +Lichens + Mammals +Molluscs +
                        Reptiles +VascularPlants +Threatened + Endangered +Rangesize +
                        Year,
                      family = quasipoisson,
@@ -764,7 +759,7 @@ m8_supp_db_std <- model.matrix(n_cc_sdm ~ taxonomic_group + log_range_am + sara_
   rename()
 
 m8_supp_db_std_clean <- m8_supp_db_std
-colnames(m8_supp_db_std_clean) <- c("Intercept","Amphibians","Lichens","Mammals","Molluscs","Mosses","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","CCThreat","n_cc_sdm")
+colnames(m8_supp_db_std_clean) <- c("Intercept","Amphibians","Lichens","Mammals","Molluscs","Reptiles","VascularPlants","Rangesize","Threatened","Endangered","Year","CCThreat","n_cc_sdm")
 
 ## Build model ##===============================================================
 
@@ -774,7 +769,6 @@ m8_supp_std <- glm (n_cc_sdm ~
                  taxonomic_groupLichens +
                  taxonomic_groupMammals +
                  taxonomic_groupMolluscs +
-                 taxonomic_groupMosses +
                  taxonomic_groupReptiles +
                  taxonomic_groupVascularPlants +
                  sara_status_adjThreatened + 
@@ -787,7 +781,7 @@ m8_supp_std <- glm (n_cc_sdm ~
 
 # for saving model results
 m8_supp_std_clean <- glm (n_cc_sdm ~ Amphibians + Lichens +Mammals +Molluscs +
-                       Mosses +Reptiles +VascularPlants +Threatened + Endangered +
+                       Reptiles +VascularPlants +Threatened + Endangered +
                        Rangesize +Year + CCThreat,
                      family = quasipoisson,
                      data = m8_supp_db_std_clean)

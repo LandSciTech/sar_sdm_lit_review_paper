@@ -34,7 +34,7 @@ sarsdm <- sarsdm %>%
   filter(taxonomic_group != "Mosses") %>% 
   # convert binary response variables into factors
   mutate(year = min_year_of_listing,
-         sdm = factor(sdm),
+         sdm = factor(n_sdm > 0),
          cc_sdm = factor(cc_sdm),
          sdm_ca = factor(sdm_ca),
          cc_sdm_ca = factor(cc_sdm_ca))%>%
