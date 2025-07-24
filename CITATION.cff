@@ -1,0 +1,13 @@
+cff-version: 1.1.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: Keefe
+  given-names: Hannah
+- family-names: Endicott
+  given-names: Sarah
+- family-names: Naujokaitis-Lewis
+  given-names: Ilona
+title: Use of Species Distribution Models in Extinction Risk Assessments and Recovery Plans for Canadian Species-at-risk: Dataset
+version: 0.1
+date-released: 2025-07-10
+                            
