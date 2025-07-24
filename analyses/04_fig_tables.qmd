@@ -894,7 +894,7 @@ dev.off()
 
 # M1: probability of inclusion in SDM #=========================================
 
-m1_plt_data <- sjPlot::plot_model(m1_std_clean, sort.est = FALSE, title = "SDM inclusion model",
+m1_plt_data <- sjPlot::plot_model(m1_std_clean, sort.est = FALSE, title = "SDM inclusion",
                                transform = NULL)$data  %>% 
   mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
                            str_detect(term, "Birds") ~ 1,
@@ -933,7 +933,7 @@ m1_plt_data <- sjPlot::plot_model(m1_std_clean, sort.est = FALSE, title = "SDM i
 m1_plt <- m1_plt_data %>% 
   ggplot(aes(term, estimate))+
   theme_classic()+
-  ggtitle("SDM inclusion model")+
+  ggtitle("SDM inclusion")+
   geom_hline(yintercept = 0, col = "grey", size = 0.2)+
   geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
   geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
@@ -950,7 +950,7 @@ m1_plt <- m1_plt_data %>%
 
 # M2: Probability of inclusion in CC-SDM #======================================
 
-m2_plt_data <- sjPlot::plot_model(m2_std_clean, sort.est = FALSE, title = "CC-SDM inclusion model",
+m2_plt_data <- sjPlot::plot_model(m2_std_clean, sort.est = FALSE, title = "CC-SDM inclusion",
                                transform = NULL)$data  %>% 
   mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
                            str_detect(term, "Birds") ~ 1,
@@ -989,7 +989,7 @@ m2_plt_data <- sjPlot::plot_model(m2_std_clean, sort.est = FALSE, title = "CC-SD
 m2_plt <- m2_plt_data %>% 
   ggplot(aes(term, estimate))+
   theme_classic()+
-  ggtitle("SDM-CC inclusion model")+
+  ggtitle("SDM-CC inclusion")+
   geom_hline(yintercept = 0, col = "grey", size = 0.2)+
   geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
   geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
@@ -1005,7 +1005,7 @@ m2_plt <- m2_plt_data %>%
 
 # M7: research effort for SDMs #================================================
 
-m7_plt_data <- sjPlot::plot_model(m7_std_clean, sort.est = FALSE, title = "SDM research effort model",
+m7_plt_data <- sjPlot::plot_model(m7_std_clean, sort.est = FALSE, title = "SDM research effort",
                                transform = NULL)$data  %>% 
   mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
                            str_detect(term, "Birds") ~ 1,
@@ -1044,7 +1044,7 @@ m7_plt_data <- sjPlot::plot_model(m7_std_clean, sort.est = FALSE, title = "SDM r
 m7_plt <- m7_plt_data %>% 
   ggplot(aes(term, estimate))+
   theme_classic()+
-  ggtitle("SDM research effort model")+
+  ggtitle("SDM research effort")+
   geom_hline(yintercept = 0, col = "grey", size = 0.2)+
   geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
   geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
@@ -1060,7 +1060,7 @@ m7_plt <- m7_plt_data %>%
 
 # M8: reserach effort for CC-SDMs #=============================================
 
-m8_plt_data <- sjPlot::plot_model(m8_std_clean, sort.est = FALSE, title = "CC-SDM research effort model",
+m8_plt_data <- sjPlot::plot_model(m8_std_clean, sort.est = FALSE, title = "CC-SDM research effort",
                                transform = NULL)$data  %>% 
   mutate(group = case_when(str_detect(term, "Amphibians") ~ 1,
                            str_detect(term, "Birds") ~ 1,
@@ -1099,7 +1099,7 @@ m8_plt_data <- sjPlot::plot_model(m8_std_clean, sort.est = FALSE, title = "CC-SD
 m8_plt <- m8_plt_data %>% 
   ggplot(aes(term, estimate))+
   theme_classic()+
-  ggtitle("SDM-CC research effort model")+
+  ggtitle("SDM-CC research effort")+
   geom_hline(yintercept = 0, col = "grey", size = 0.2)+
   geom_segment(aes(y = estimate + 0.038, yend = conf.high, xend = term))+
   geom_segment(aes(y = conf.low, yend = estimate - 0.038, xend = term))+
