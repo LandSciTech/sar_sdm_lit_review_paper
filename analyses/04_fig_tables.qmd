@@ -215,8 +215,8 @@ fig_pnl_cum_temp_trends_sdm_lit <- trend_dat %>%
   geom_line(aes(colour=factor(label))) +    
   geom_point(aes(colour = factor(label)))+
   theme_classic() +
-  scale_color_manual(values = c('#562988', 
-                                '#33A02B')) + 
+  scale_color_manual(values = c('#ae017e', 
+                                "#1a80bb")) + 
   ylab("Cumulative number\nof papers")+   
   xlab("Publication year")+   
   ylim(0,200) +
@@ -233,8 +233,8 @@ fig_pnl_abs_temp_trends_sdm_lit <- trend_dat %>%
   geom_line(aes(colour=factor(label))) +    
   geom_point(aes(colour = factor(label)))+
   theme_classic() +
-  scale_color_manual(values = c('#562988',
-                                 '#33A02B'))+ 
+  scale_color_manual(values = c('#ae017e',
+                                 "#1a80bb"))+ 
   ylab("Number of papers")+   
   xlab("Publication year")+   
   ylim(0,25) +
@@ -497,9 +497,9 @@ fig_pnl_num_ppr <- fig_ppr_db %>%
   ggplot(aes(x = fct_rev(taxonomic_group), y = n_ppr, fill = fct_rev(label))) +
   geom_bar(position = "stack", stat = "identity") +
   scale_fill_manual(values = c(#'#B2DF8A', 
-                               '#1F78B4',
+                               "#ea801c",
                                #'#A5CEE2', 
-                               '#33A02B'
+                               "#1a80bb"
                                 )) + 
   #scale_fill_brewer(palette = "Paired") +
   guides(fill = guide_legend(reverse=T)) +
@@ -552,10 +552,10 @@ fig_pnl_prop_sp_model <- na_db_alt %>%
         axis.text.y = element_text(size = 10.5),
         axis.text.x = element_text(size = 10.5),
         legend.text = element_text(size = 9)) +
-  scale_fill_manual(values = c('grey', # no SDM
-                               '#1c63a5', # SDM-No CC
-                               '#2c9320', #SDM-CC
-                               '#562888' # SDM-CC &\nSDM-No CC                              
+  scale_fill_manual(values = c("#b8b8b8", # no SDM
+                               "#ea801c", # SDM-No CC
+                               "#1a80bb", #SDM-CC
+                               "#ae017e" # SDM-CC &\nSDM-No CC                              
                                )) + 
   guides(fill = guide_legend(reverse=T)) +
   scale_y_continuous(expand = expansion(mult = c(0, .05))) +
@@ -569,10 +569,10 @@ fig_pnl_prop_sp_model <- na_db_alt %>%
 
 leg_plt <- ggplot(data.frame(x = as.factor(1:4), y = 1:4), aes(x,y, fill = x))+
 geom_col()+
-scale_fill_manual(name = NULL, values = rev(c('grey', # no SDM
-                               '#1c63a5', # SDM-No CC
-                               '#2c9320', #SDM-CC
-                               '#562888' # SDM-CC &\nSDM-No CC                        
+scale_fill_manual(name = NULL, values = rev(c("#b8b8b8", # no SDM
+                               "#ea801c", # SDM-No CC
+                               "#1a80bb", #SDM-CC
+                               "#ae017e" # SDM-CC &\nSDM-No CC                        
                                )),
                   labels = rev(c("No SDM", "SDM-No CC", "SDM-CC", "All SDMs")))+
 theme(legend.position = "top")
@@ -821,8 +821,7 @@ fig_pnl_sdm_re <- re_na_sdm_bin %>%
   geom_bar(position = "stack", stat = "identity") +
   geom_text(aes(taxonomic_group, 1.05, label = n_taxa, fill = NULL), size = 3, colour = '#36454F', data = sp_taxa_label_re) +
   theme_classic() +
-  scale_fill_manual(values=c("#4A1486", "#6A51A3", "#807DBA",
-                             "#9E9AC8", "grey")) +
+  scale_fill_manual(values=rev(c("grey", "#feebe2", "#fbb4b9", "#f768a1", "#ae017e"))) +
   ylab("Proportion of species") +
   xlab(element_blank()) +
   labs(fill = "Number of papers") +
@@ -849,7 +848,7 @@ fig_pnl_cc_sdm_re <- re_na_cc_sdm_bin %>%
   geom_bar(position = "stack", stat = "identity") +
   geom_text(aes(taxonomic_group, 1.05, label = n_taxa, fill = NULL), size = 3, colour = '#36454F', data = sp_taxa_label_re) +
   theme_classic() +
-  scale_fill_manual(values = c("#238B45", "#74C476", "#BAE4B3", "grey")) +
+  scale_fill_manual(values = c("#d7301f", "#fc8d59", "#fdcc8a", "grey")) +
   ylab("Proportion of species") +
   xlab(element_blank()) +
   labs(fill = "Number of papers") +
@@ -1712,10 +1711,10 @@ fig_pnl_prop_doc_sdms_ld <- tbl_taxa_doc_sdm_comb_ld %>%
             colour = '#36454F', data = n_docs_taxa) +
   ylab("Proportion of documents") +
   xlab(element_blank()) +
-  scale_fill_manual(values = c('grey', # no SDMs
-                               '#1c63a5', # SDM w/out CC
-                               '#2c9320', #CC-SDM
-                               '#562888' # SDM-CC &\nSDM-No CC
+  scale_fill_manual(values = c("#b8b8b8", # no SDMs
+                               "#ea801c", # SDM w/out CC
+                               "#1a80bb", #CC-SDM
+                               '#ae017e' # SDM-CC &\nSDM-No CC
                                )) + 
   guides(fill = guide_legend(reverse=T)) +
   scale_y_continuous(expand = expansion(mult = c(0, .05))) +
@@ -1747,10 +1746,10 @@ fig_temp_trend_prop_doc_ld <- plot_grid(fig_pnl_temp_trends_ld,
 
 fig_pnl_sdm_uses_ld <- bind_rows(cc_sdm_sections, oth_sdm_sections) %>%
   mutate(sdm_label = factor(sdm_type,
-                            levels = c("CC-SDM",
-                                       "OTH-SDM"),
-                            labels = c("SDM-CC",
-                                       "SDM-No CC")),
+                            levels = rev(c("CC-SDM",
+                                       "OTH-SDM")),
+                            labels = rev(c("SDM-CC",
+                                       "SDM-No CC"))),
          section = factor(section,
                           levels = c("Other",
                                      "Critical Habitat",
@@ -1768,9 +1767,9 @@ fig_pnl_sdm_uses_ld <- bind_rows(cc_sdm_sections, oth_sdm_sections) %>%
   geom_col() +
   #geom_text(aes(label = n_doc))+
   # colours if using the application types as colours
-  scale_fill_manual(values = c('#2c9320', #SDM-CC
-                               '#1c63a5' # SDM-No CC
-                               ), drop = TRUE) +
+  scale_fill_manual(values = rev(c("#1a80bb", #SDM-CC
+                               "#ea801c" # SDM-No CC
+                               )), drop = TRUE) +
   ylab("Number of documents") +
   xlab(element_blank()) +
   guides(fill = guide_legend(reverse=T)) +
@@ -1820,10 +1819,10 @@ fig_ldtype_doc_comb_sdm <- fig_ldtype_doc_sdm_comb_ld %>%
   geom_text(aes(doc_type, 1.05, label = tot_doc_type, fill = NULL), size = 3) +
   ylab("Proportion of documents") +
   xlab(element_blank()) +
-  scale_fill_manual(values = c('grey', #no SDM
-                               '#1c63a5', #SDM-No CC
-                               '#2c9320', #SDM-CC
-                               '#562888') ) + #SDM-CC &\nSDM-No CC
+  scale_fill_manual(values = c("#b8b8b8", #no SDM
+                               "#ea801c", #SDM-No CC
+                               "#1a80bb", #SDM-CC
+                               '#ae017e') ) + #SDM-CC &\nSDM-No CC
   guides(fill = guide_legend(reverse=T)) +
   scale_y_continuous(expand = expansion(mult = c(0, .05))) +
   coord_flip() +
@@ -2383,8 +2382,8 @@ supp_fig_pnl_sdm_uses_ld_by_doctype <- bind_rows(cc_sdm_sections, oth_sdm_sectio
   geom_col() +
   #geom_text(aes(label = n_doc))+
   # colours if using the application types as colours
-  scale_fill_manual(values = c('#2c9320', #SDM-CC
-                               '#1c63a5' # SDM-No CC
+  scale_fill_manual(values = c("#1a80bb", #SDM-CC
+                               "#ea801c" # SDM-No CC
                                ), drop = TRUE) +
   ylab("Number of documents") +
   xlab(element_blank()) +
@@ -2457,8 +2456,8 @@ supp_fig_pnl_sdm_uses_ld_by_taxgrp <- sdm_section_by_taxgrp %>%
   ggplot(aes(x = sdm_section, fill = sdm_type)) +
   geom_bar() +
   # colours if using the application types as colours
-  scale_fill_manual(values = c('#2c9320', #SDM-CC
-                               '#1c63a5' # SDM-No CC
+  scale_fill_manual(values = c("#1a80bb", #SDM-CC
+                               "#ea801c" # SDM-No CC
                                ), drop = TRUE) +
   ylab("Number of documents") +
   xlab(element_blank()) +
@@ -2522,10 +2521,10 @@ supp_fig_prop_sp_model_ca <- ca_db_alt %>%
         axis.text.y = element_text(size = 10.5),
         axis.text.x = element_text(size = 10.5),
         legend.text = element_text(size = 9)) +
-  scale_fill_manual(values = c('grey', # no SDM
-                               '#1c63a5', # SDM-No CC
-                               '#2c9320', #SDM-CC
-                               '#562888' # SDM-CC &\nSDM-No CC
+  scale_fill_manual(values = c("#b8b8b8", # no SDM
+                               "#ea801c", # SDM-No CC
+                               "#1a80bb", #SDM-CC
+                               '#ae017e' # SDM-CC &\nSDM-No CC
                                ) ) + 
   guides(fill = guide_legend(reverse=T)) +
   scale_y_continuous(expand = expansion(mult = c(0, .05))) +
@@ -2643,7 +2642,7 @@ supp_fig_diff_re_sdm <- re_diff_sdm_m %>%
                                '#aeaed4', #3
                                '#d0d1e5', #2
                                '#ebe8f1', #1
-                               'grey' #0
+                               "#b8b8b8" #0
                                )) +
   guides(fill = guide_legend(reverse=T)) +
   ylab("Proportion of species") +
@@ -2669,7 +2668,7 @@ supp_fig_diff_re_cc_sdm <- re_diff_cc_sdm_m %>%
                                '#93d289', #3
                                '#bce5b4', #2
                                '#dff4da', #1
-                               'grey' # 0 
+                               "#b8b8b8" # 0 
                                ))+ 
   guides(fill = guide_legend(reverse=T)) +
   ylab("Proportion of species") +
@@ -2794,7 +2793,7 @@ supp_fig_sdm_re_ca <- re_ca_sdm_bin %>%
   geom_bar(position = "stack", stat = "identity") +
   geom_text(aes(taxonomic_group, 1.05, label = n_taxa, fill = NULL), size = 3, colour = '#36454F', data = sp_taxa_label_re) +
   theme_classic() +
-  scale_fill_manual(values=c('#2f006a', '#553b92','#8d85be','#d0d1e5','grey')) +
+  scale_fill_manual(values=c('#2f006a', '#553b92','#8d85be','#d0d1e5',"#b8b8b8")) +
   ylab("Proportion of species") +
   xlab(element_blank()) +
   labs(fill = "Number of papers") +
@@ -2822,7 +2821,7 @@ supp_fig_cc_sdm_re_ca <- re_ca_cc_sdm_bin %>%
   geom_bar(position = "stack", stat = "identity") +
   geom_text(aes(taxonomic_group, 1.05, label = n_taxa, fill = NULL), size = 3, colour = '#36454F', data = sp_taxa_label_re) +
   theme_classic() +
-  scale_fill_manual(values = c('#0c5c21','#379e4b','#dff4da','grey')) +
+  scale_fill_manual(values = c('#0c5c21','#379e4b','#dff4da',"#b8b8b8")) +
   ylab("Proportion of species") +
   xlab(element_blank()) +
   labs(fill = "Number of papers") +
